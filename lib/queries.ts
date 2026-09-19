@@ -72,6 +72,10 @@ export async function listOutstandingSales(): Promise<OutstandingSale[]> {
     .prepare(
       `SELECT
         s.id,
+        CASE
+          WHEN s.customer_name IS NOT NULL AND s.customer_name <> '' THEN s.customer_name || ' · '
+          ELSE ''
+        END ||
         COALESCE(GROUP_CONCAT(
           CASE
             WHEN v.variant_name IS NULL OR v.variant_name = '' THEN p.name
@@ -98,7 +102,7 @@ export async function listOutstandingSales(): Promise<OutstandingSale[]> {
         AND pay.organization_id = s.organization_id
       WHERE s.organization_id = ?
         AND s.status = 'COMPLETED'
-      GROUP BY s.id, s.total_minor, pay.paid_minor, s.created_at
+      GROUP BY s.id, s.customer_name, s.total_minor, pay.paid_minor, s.created_at
       HAVING s.total_minor - COALESCE(pay.paid_minor, 0) > 0
       ORDER BY s.created_at DESC
       LIMIT 50`
