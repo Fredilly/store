@@ -256,3 +256,29 @@ Staff access is invitation-based.
 - Authorization is enforced server-side with role checks; hidden UI is not treated as a security boundary.
 - Staff activation/deactivation and invitation acceptance are audit events.
 
+## Authentication UX and Recovery
+Authentication uses Better Auth with these supported paths:
+
+- Continue with Google when Google OAuth credentials are configured
+- email + password fallback
+- password confirmation on new email/password accounts
+- forgot-password email with an expiring reset link
+- password reset revokes other active sessions
+- transactional welcome email for newly created users
+
+Transactional auth email is sent through Resend using the verified Article6 domain.
+
+Required production secrets:
+- BETTER_AUTH_SECRET
+- BETTER_AUTH_URL
+- RESEND_API_KEY
+- GOOGLE_CLIENT_ID
+- GOOGLE_CLIENT_SECRET
+
+Optional:
+- EMAIL_FROM
+
+Google and credential accounts with the same verified email should resolve to one Better Auth user rather than creating a second school identity.
+
+Magic-link sign-in is deferred until real usage shows a need for a third sign-in method.
+
