@@ -1,5 +1,6 @@
-import { DEFAULT_ORG_ID, db } from "../../../lib/db";
+import { db } from "../../../lib/db";
 import { toMinor } from "../../../lib/money";
+import { requireTenant } from "../../../lib/tenant";
 
 type VariantRow = {
   id: string;
@@ -8,6 +9,13 @@ type VariantRow = {
 };
 
 export async function POST(request: Request) {
+  let tenant;
+  try {
+    tenant = await requireTenant(request.headers);
+  } catch {
+    return Response.redirect(new URL("/login", request.url), 303);
+  }
+
   const form = await request.formData();
   const variantId = String(form.get("variant_id") ?? "");
   const quantity = Number.parseInt(String(form.get("quantity") ?? "1"), 10);
@@ -33,7 +41,7 @@ export async function POST(request: Request) {
         AND v.active = 1
       GROUP BY v.id, v.selling_price_minor`
     )
-    .bind(variantId, DEFAULT_ORG_ID)
+    .bind(variantId, tenant.orgId)
     .first<VariantRow>();
 
   if (!variant || Number(variant.stock) < quantity) {
@@ -55,13 +63,13 @@ export async function POST(request: Request) {
 
   const statements = [
     database.prepare(
-      "INSERT INTO sales (id, organization_id, total_minor, customer_name) VALUES (?, ?, ?, ?)"
-    ).bind(saleId, DEFAULT_ORG_ID, totalMinor, customerName || null),
+      "INSERT INTO sales (id, organization_id, total_minor, customer_name, created_by_user_id) VALUES (?, ?, ?, ?, ?)"
+    ).bind(saleId, tenant.orgId, totalMinor, customerName || null, tenant.userId),
     database.prepare(
       "INSERT INTO sale_items (id, organization_id, sale_id, product_variant_id, quantity, unit_price_minor, line_total_minor) VALUES (?, ?, ?, ?, ?, ?, ?)"
     ).bind(
       itemId,
-      DEFAULT_ORG_ID,
+      tenant.orgId,
       saleId,
       variantId,
       quantity,
@@ -69,30 +77,30 @@ export async function POST(request: Request) {
       totalMinor
     ),
     database.prepare(
-      "INSERT INTO stock_movements (id, organization_id, product_variant_id, movement_type, quantity_delta, related_sale_id) VALUES (?, ?, ?, 'SALE', ?, ?)"
-    ).bind(movementId, DEFAULT_ORG_ID, variantId, -quantity, saleId),
+      "INSERT INTO stock_movements (id, organization_id, product_variant_id, movement_type, quantity_delta, related_sale_id, created_by_user_id) VALUES (?, ?, ?, 'SALE', ?, ?, ?)"
+    ).bind(movementId, tenant.orgId, variantId, -quantity, saleId, tenant.userId),
   ];
 
   if (amountPaidMinor > 0) {
     statements.push(
       database.prepare(
-        "INSERT INTO payments (id, organization_id, sale_id, amount_minor) VALUES (?, ?, ?, ?)"
-      ).bind(crypto.randomUUID(), DEFAULT_ORG_ID, saleId, amountPaidMinor)
+        "INSERT INTO payments (id, organization_id, sale_id, amount_minor, received_by_user_id) VALUES (?, ?, ?, ?, ?)"
+      ).bind(crypto.randomUUID(), tenant.orgId, saleId, amountPaidMinor, tenant.userId)
     );
   }
 
   statements.push(
     database.prepare(
-      "INSERT INTO audit_events (id, organization_id, event_type, entity_type, entity_id, metadata_json) VALUES (?, ?, 'SALE_CREATED', 'sale', ?, ?)"
+      "INSERT INTO audit_events (id, organization_id, actor_user_id, event_type, entity_type, entity_id, metadata_json) VALUES (?, ?, ?, 'SALE_CREATED', 'sale', ?, ?)"
     ).bind(
       crypto.randomUUID(),
-      DEFAULT_ORG_ID,
+      tenant.orgId,
+      tenant.userId,
       saleId,
       JSON.stringify({ variantId, quantity, totalMinor, amountPaidMinor, customerName })
     )
   );
 
   await database.batch(statements);
-
   return Response.redirect(new URL("/sell?saved=1", request.url), 303);
 }
