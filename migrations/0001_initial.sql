@@ -73,6 +73,7 @@ CREATE TABLE IF NOT EXISTS sales (
   organization_id TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'COMPLETED',
   total_minor INTEGER NOT NULL,
+  customer_name TEXT,
   created_by_user_id TEXT,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   voided_at TEXT,
