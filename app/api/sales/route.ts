@@ -102,5 +102,5 @@ export async function POST(request: Request) {
   );
 
   await database.batch(statements);
-  return Response.redirect(new URL("/sell?saved=1", request.url), 303);
+  return Response.redirect(new URL("/?success=sale", request.url), 303);
 }
