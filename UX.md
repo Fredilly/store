@@ -129,3 +129,19 @@ Do not require the owner to manually navigate back after each routine transactio
 Inventory and Money remain separate views because they are primarily for checking information rather than rapid repeated entry.
 
 Creating a brand-new product may remain on the Add Stock screen so stock can be added immediately after creation.
+
+
+## Plain-Language Number Labels
+Never place an unexplained number beside another number.
+
+Inventory cards should explicitly label:
+- selling price
+- quantity in stock
+
+Money should use:
+- Total sold = value of items sold
+- Money received = amount already paid
+- Still owed = sold amount not yet paid
+- Expenses = money spent from the shop
+
+Prefer “Still owed” over “Outstanding” in primary UI because it is clearer for non-technical users.

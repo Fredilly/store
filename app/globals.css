@@ -429,3 +429,32 @@ button {
 .successBanner strong {
   font-size: 1rem;
 }
+
+
+.stockCount {
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+  min-width: 72px;
+}
+
+.stockCount b {
+  text-align: right;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.stockCount span {
+  margin: 0;
+  color: #777c84;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.moneyCard small {
+  display: block;
+  margin-top: 8px;
+  color: #777c84;
+  font-size: 0.82rem;
+  line-height: 1.3;
+}
