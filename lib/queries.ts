@@ -7,6 +7,15 @@ export type VariantOption = {
   stock: number;
 };
 
+export type OutstandingSale = {
+  id: string;
+  label: string;
+  total_minor: number;
+  paid_minor: number;
+  balance_minor: number;
+  created_at: string;
+};
+
 export async function listVariants(): Promise<VariantOption[]> {
   const result = await db()
     .prepare(
@@ -56,4 +65,51 @@ export async function moneySummary() {
     outstanding: Math.max(0, sales - received),
     expenses,
   };
+}
+
+export async function listOutstandingSales(): Promise<OutstandingSale[]> {
+  const result = await db()
+    .prepare(
+      `SELECT
+        s.id,
+        COALESCE(GROUP_CONCAT(
+          CASE
+            WHEN v.variant_name IS NULL OR v.variant_name = '' THEN p.name
+            ELSE p.name || ' · ' || v.variant_name
+          END,
+          ', '
+        ), 'Sale') AS label,
+        s.total_minor,
+        COALESCE(pay.paid_minor, 0) AS paid_minor,
+        s.total_minor - COALESCE(pay.paid_minor, 0) AS balance_minor,
+        s.created_at
+      FROM sales s
+      JOIN sale_items si
+        ON si.sale_id = s.id
+        AND si.organization_id = s.organization_id
+      JOIN product_variants v ON v.id = si.product_variant_id
+      JOIN products p ON p.id = v.product_id
+      LEFT JOIN (
+        SELECT sale_id, organization_id, SUM(amount_minor) AS paid_minor
+        FROM payments
+        GROUP BY sale_id, organization_id
+      ) pay
+        ON pay.sale_id = s.id
+        AND pay.organization_id = s.organization_id
+      WHERE s.organization_id = ?
+        AND s.status = 'COMPLETED'
+      GROUP BY s.id, s.total_minor, pay.paid_minor, s.created_at
+      HAVING s.total_minor - COALESCE(pay.paid_minor, 0) > 0
+      ORDER BY s.created_at DESC
+      LIMIT 50`
+    )
+    .bind(DEFAULT_ORG_ID)
+    .all<OutstandingSale>();
+
+  return result.results.map((row) => ({
+    ...row,
+    total_minor: Number(row.total_minor),
+    paid_minor: Number(row.paid_minor),
+    balance_minor: Number(row.balance_minor),
+  }));
 }
