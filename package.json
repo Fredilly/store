@@ -7,7 +7,7 @@
     "dev": "vinext dev",
     "build": "vinext build",
     "preview": "vite preview",
-    "deploy": "npm run build && wrangler deploy",
+    "deploy": "vinext-cloudflare deploy",
     "cf-typegen": "wrangler types",
     "dev:next": "next dev",
     "build:next": "next build",
