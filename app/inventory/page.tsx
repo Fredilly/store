@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { listVariants } from "../../lib/queries";
 import { formatNaira } from "../../lib/money";
+import { requirePageTenant } from "../../lib/tenant";
 
 export default async function InventoryPage() {
-  const variants = await listVariants();
+  const tenant = await requirePageTenant();
+  const variants = await listVariants(tenant.orgId);
 
   return (
     <main className="shell">
