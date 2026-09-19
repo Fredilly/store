@@ -159,10 +159,10 @@ Do not show staff the owner money summary, Money action, product-creation contro
 The Staff screen is secondary owner-only navigation. Adding staff should require only name and email. Until magic-link or Google sign-in is added, the invited person creates or signs in to an account using the exact invited email.
 
 ## Sign-In and Recovery
-Preferred sign-in order:
+Preferred sign-in layout:
 
-1. Continue with Google when available
-2. Email + password
+1. Email + password
+2. Continue with Google as the secondary option at the bottom
 
 Email/password account creation requires:
 - name

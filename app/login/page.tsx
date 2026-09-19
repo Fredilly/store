@@ -72,20 +72,6 @@ export default function LoginPage() {
             : "Use the email your school owner invited, or create a new school."}
         </p>
 
-        {googleEnabled && (
-          <>
-            <button
-              className="buttonSecondary"
-              disabled={busy}
-              type="button"
-              onClick={signInWithGoogle}
-            >
-              Continue with Google
-            </button>
-            <p className="muted">or use email and password</p>
-          </>
-        )}
-
         <form className="form authForm" onSubmit={submit}>
           {mode === "signup" && (
             <label>
@@ -168,6 +154,20 @@ export default function LoginPage() {
             ? "First time? Create account"
             : "Already have an account? Sign in"}
         </button>
+
+        {googleEnabled && (
+          <>
+            <p className="muted">or</p>
+            <button
+              className="buttonSecondary"
+              disabled={busy}
+              type="button"
+              onClick={signInWithGoogle}
+            >
+              Continue with Google
+            </button>
+          </>
+        )}
       </section>
     </main>
   );
