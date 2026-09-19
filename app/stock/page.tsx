@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { listVariants } from "../../lib/queries";
+import { requirePageTenant } from "../../lib/tenant";
 
 export default async function StockPage() {
-  const variants = await listVariants();
+  const tenant = await requirePageTenant();
+  const variants = await listVariants(tenant.orgId);
 
   return (
     <main className="shell">
@@ -29,17 +31,14 @@ export default async function StockPage() {
                 ))}
               </select>
             </label>
-
             <label>
               Quantity received
               <input name="quantity" inputMode="numeric" min="1" type="number" defaultValue="1" required />
             </label>
-
             <label>
               Unit cost, optional
               <input name="unit_cost" inputMode="decimal" min="0" step="0.01" type="number" placeholder="0" />
             </label>
-
             <button type="submit">Save stock</button>
           </form>
         )}
