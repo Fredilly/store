@@ -3,11 +3,10 @@ import { formatNaira } from "../lib/money";
 import { moneySummary } from "../lib/queries";
 import { requirePageTenant } from "../lib/tenant";
 
-const actions = [
+const baseActions = [
   { label: "Sell Item", href: "/sell", detail: "Record a sale" },
   { label: "Add Stock", href: "/stock", detail: "Record items received" },
   { label: "Inventory", href: "/inventory", detail: "See what is left" },
-  { label: "Money", href: "/money", detail: "Sold, received, still owed" },
 ];
 
 const successMessages: Record<string, string> = {
@@ -21,9 +20,13 @@ export default async function Home({
   searchParams?: Promise<{ success?: string }>;
 }) {
   const tenant = await requirePageTenant();
-  const summary = await moneySummary(tenant.orgId);
+  const summary = tenant.role === "OWNER" ? await moneySummary(tenant.orgId) : null;
   const params = (await searchParams) ?? {};
   const success = params.success ? successMessages[params.success] : undefined;
+  const actions =
+    tenant.role === "OWNER"
+      ? [...baseActions, { label: "Money", href: "/money", detail: "Sold, received, still owed" }]
+      : baseActions;
 
   return (
     <main className="shell">
@@ -45,20 +48,22 @@ export default async function Home({
         <p className="muted">What do you want to do?</p>
       </header>
 
-      <section className="summary" aria-label="Money summary">
-        <div>
-          <span>Total sold</span>
-          <strong>{formatNaira(summary.sales)}</strong>
-        </div>
-        <div>
-          <span>Money received</span>
-          <strong>{formatNaira(summary.received)}</strong>
-        </div>
-        <div>
-          <span>Still owed</span>
-          <strong>{formatNaira(summary.outstanding)}</strong>
-        </div>
-      </section>
+      {summary && (
+        <section className="summary" aria-label="Money summary">
+          <div>
+            <span>Total sold</span>
+            <strong>{formatNaira(summary.sales)}</strong>
+          </div>
+          <div>
+            <span>Money received</span>
+            <strong>{formatNaira(summary.received)}</strong>
+          </div>
+          <div>
+            <span>Still owed</span>
+            <strong>{formatNaira(summary.outstanding)}</strong>
+          </div>
+        </section>
+      )}
 
       <section className="actions" aria-label="Main actions">
         {actions.map((action) => (
@@ -68,6 +73,12 @@ export default async function Home({
           </a>
         ))}
       </section>
+
+      {tenant.role === "OWNER" && (
+        <p className="muted">
+          <a className="inlineAction" href="/staff">Manage staff →</a>
+        </p>
+      )}
     </main>
   );
 }
