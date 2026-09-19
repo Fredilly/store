@@ -61,9 +61,22 @@ Decision: This is an inventory/sales ledger, not a complete accounting, school m
 Add adjacent modules only after real usage demonstrates demand.
 
 
-## 2026-09-19: Temporary Single-Owner Bootstrap
+## 2026-09-19: Temporary Single-Owner Bootstrap (Superseded)
 Decision: The first database-backed preview uses the seeded organization ID `org_default` until authentication and organization membership are wired.
 
 Reason: This lets the inventory, sales, payment, expense, and audit ledger be tested immediately without weakening the final multi-tenant schema.
 
 Constraint: Do not treat `org_default` as the final authorization model and do not load sensitive real-school data until owner authentication and server-side membership scoping are enabled.
+
+
+## 2026-09-19: Better Auth Owner Login Enabled
+Decision: Replace the temporary `org_default` runtime access model with Better Auth email/password sessions and server-side organization membership lookup.
+
+Reason: Real school records must be isolated by authenticated tenant before the first production user enters data.
+
+Implementation:
+- Better Auth uses the existing D1 database.
+- New owners create an account and then create their school workspace.
+- Every protected page resolves its organization from the authenticated session.
+- Every core mutation re-checks organization membership server-side.
+- `org_default` remains only as legacy bootstrap data from migration 0001 and is no longer used by application reads or writes.
