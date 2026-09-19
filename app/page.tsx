@@ -7,7 +7,7 @@ const actions = [
   { label: "Sell Item", href: "/sell", detail: "Record a sale" },
   { label: "Add Stock", href: "/stock", detail: "Record items received" },
   { label: "Inventory", href: "/inventory", detail: "See what is left" },
-  { label: "Money", href: "/money", detail: "Sales, received, outstanding" },
+  { label: "Money", href: "/money", detail: "Sold, received, still owed" },
 ];
 
 const successMessages: Record<string, string> = {
@@ -47,15 +47,15 @@ export default async function Home({
 
       <section className="summary" aria-label="Money summary">
         <div>
-          <span>Sales</span>
+          <span>Total sold</span>
           <strong>{formatNaira(summary.sales)}</strong>
         </div>
         <div>
-          <span>Received</span>
+          <span>Money received</span>
           <strong>{formatNaira(summary.received)}</strong>
         </div>
         <div>
-          <span>Outstanding</span>
+          <span>Still owed</span>
           <strong>{formatNaira(summary.outstanding)}</strong>
         </div>
       </section>
