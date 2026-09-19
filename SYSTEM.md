@@ -244,3 +244,15 @@ After sign-in:
 A new owner creates an account, then completes a one-screen school setup flow. The school workspace is created in `organizations` and linked through `organization_members`.
 
 `BETTER_AUTH_SECRET` must be configured as a Cloudflare Worker secret before real use.
+
+## Staff Invitations and Authorization
+Staff access is invitation-based.
+
+- Owners create pending staff invitations by normalized email address.
+- An authenticated user whose email matches a pending invitation is linked to that school as STAFF.
+- Invited staff cannot use the organization setup endpoint to create a separate owner workspace before accepting the invite.
+- STAFF may record sales, receive stock, and view inventory.
+- Money, product creation/price control, expenses, payments against outstanding balances, and staff management are OWNER-only unless a later decision explicitly expands permissions.
+- Authorization is enforced server-side with role checks; hidden UI is not treated as a security boundary.
+- Staff activation/deactivation and invitation acceptance are audit events.
+
