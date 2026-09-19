@@ -11,6 +11,7 @@ export async function POST(request: Request) {
   const form = await request.formData();
   const variantId = String(form.get("variant_id") ?? "");
   const quantity = Number.parseInt(String(form.get("quantity") ?? "1"), 10);
+  const customerName = String(form.get("customer_name") ?? "").trim();
 
   if (!variantId || !Number.isInteger(quantity) || quantity <= 0) {
     return Response.redirect(new URL("/sell?error=invalid", request.url), 303);
@@ -54,8 +55,8 @@ export async function POST(request: Request) {
 
   const statements = [
     database.prepare(
-      "INSERT INTO sales (id, organization_id, total_minor) VALUES (?, ?, ?)"
-    ).bind(saleId, DEFAULT_ORG_ID, totalMinor),
+      "INSERT INTO sales (id, organization_id, total_minor, customer_name) VALUES (?, ?, ?, ?)"
+    ).bind(saleId, DEFAULT_ORG_ID, totalMinor, customerName || null),
     database.prepare(
       "INSERT INTO sale_items (id, organization_id, sale_id, product_variant_id, quantity, unit_price_minor, line_total_minor) VALUES (?, ?, ?, ?, ?, ?, ?)"
     ).bind(
@@ -87,7 +88,7 @@ export async function POST(request: Request) {
       crypto.randomUUID(),
       DEFAULT_ORG_ID,
       saleId,
-      JSON.stringify({ variantId, quantity, totalMinor, amountPaidMinor })
+      JSON.stringify({ variantId, quantity, totalMinor, amountPaidMinor, customerName })
     )
   );
 
