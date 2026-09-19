@@ -34,6 +34,7 @@ export default async function MoneyPage() {
             {outstanding.map((sale) => (
               <form action="/api/payments" method="post" className="balanceRow" key={sale.id}>
                 <input type="hidden" name="sale_id" value={sale.id} />
+                <input type="hidden" name="submission_key" value={crypto.randomUUID()} />
                 <div>
                   <strong>{sale.label}</strong>
                   <span>Balance {formatNaira(sale.balance_minor)}</span>
