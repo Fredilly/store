@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import { authClient } from "../../lib/auth-client";
 
 export default function LoginPage() {
@@ -11,15 +11,6 @@ export default function LoginPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
-  const [googleEnabled, setGoogleEnabled] = useState(false);
-
-  useEffect(() => {
-    fetch("/api/auth-capabilities", { cache: "no-store" })
-      .then(async (response) => (await response.json()) as { google?: boolean })
-      .then((data) => setGoogleEnabled(Boolean(data.google)))
-      .catch(() => setGoogleEnabled(false));
-  }, []);
-
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage("");
@@ -44,21 +35,6 @@ export default function LoginPage() {
     }
 
     window.location.href = "/";
-  }
-
-  async function signInWithGoogle() {
-    setBusy(true);
-    setMessage("");
-
-    const result = await authClient.signIn.social({
-      provider: "google",
-      callbackURL: "/",
-    });
-
-    if (result?.error) {
-      setBusy(false);
-      setMessage(result.error.message || "Could not sign in with Google.");
-    }
   }
 
   return (
@@ -155,19 +131,6 @@ export default function LoginPage() {
             : "Already have an account? Sign in"}
         </button>
 
-        {googleEnabled && (
-          <>
-            <p className="muted">or</p>
-            <button
-              className="buttonSecondary"
-              disabled={busy}
-              type="button"
-              onClick={signInWithGoogle}
-            >
-              Continue with Google
-            </button>
-          </>
-        )}
       </section>
     </main>
   );
