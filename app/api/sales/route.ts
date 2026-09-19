@@ -20,12 +20,30 @@ export async function POST(request: Request) {
   const variantId = String(form.get("variant_id") ?? "");
   const quantity = Number.parseInt(String(form.get("quantity") ?? "1"), 10);
   const customerName = String(form.get("customer_name") ?? "").trim();
+  const submissionKey = String(form.get("submission_key") ?? "").trim();
 
-  if (!variantId || !Number.isInteger(quantity) || quantity <= 0) {
+  if (
+    !variantId ||
+    !submissionKey ||
+    submissionKey.length > 128 ||
+    !Number.isInteger(quantity) ||
+    quantity <= 0
+  ) {
     return Response.redirect(new URL("/sell?error=invalid", request.url), 303);
   }
 
   const database = db();
+  const existingSale = await database
+    .prepare(
+      "SELECT id FROM sales WHERE organization_id = ? AND submission_key = ? LIMIT 1"
+    )
+    .bind(tenant.orgId, submissionKey)
+    .first<{ id: string }>();
+
+  if (existingSale) {
+    return Response.redirect(new URL("/?success=sale", request.url), 303);
+  }
+
   const variant = await database
     .prepare(
       `SELECT
@@ -63,8 +81,15 @@ export async function POST(request: Request) {
 
   const statements = [
     database.prepare(
-      "INSERT INTO sales (id, organization_id, total_minor, customer_name, created_by_user_id) VALUES (?, ?, ?, ?, ?)"
-    ).bind(saleId, tenant.orgId, totalMinor, customerName || null, tenant.userId),
+      "INSERT INTO sales (id, organization_id, total_minor, customer_name, created_by_user_id, submission_key) VALUES (?, ?, ?, ?, ?, ?)"
+    ).bind(
+      saleId,
+      tenant.orgId,
+      totalMinor,
+      customerName || null,
+      tenant.userId,
+      submissionKey
+    ),
     database.prepare(
       "INSERT INTO sale_items (id, organization_id, sale_id, product_variant_id, quantity, unit_price_minor, line_total_minor) VALUES (?, ?, ?, ?, ?, ?, ?)"
     ).bind(
@@ -101,6 +126,18 @@ export async function POST(request: Request) {
     )
   );
 
-  await database.batch(statements);
+  try {
+    await database.batch(statements);
+  } catch (error) {
+    const duplicate = await database
+      .prepare(
+        "SELECT id FROM sales WHERE organization_id = ? AND submission_key = ? LIMIT 1"
+      )
+      .bind(tenant.orgId, submissionKey)
+      .first<{ id: string }>();
+
+    if (!duplicate) throw error;
+  }
+
   return Response.redirect(new URL("/?success=sale", request.url), 303);
 }
