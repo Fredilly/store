@@ -19,16 +19,16 @@ export default async function MoneyPage() {
       </div>
 
       <section className="moneyGrid">
-        <div className="moneyCard"><span>Sales</span><strong>{formatNaira(summary.sales)}</strong></div>
-        <div className="moneyCard"><span>Money received</span><strong>{formatNaira(summary.received)}</strong></div>
-        <div className="moneyCard"><span>Outstanding</span><strong>{formatNaira(summary.outstanding)}</strong></div>
-        <div className="moneyCard"><span>Expenses</span><strong>{formatNaira(summary.expenses)}</strong></div>
+        <div className="moneyCard"><span>Total sold</span><strong>{formatNaira(summary.sales)}</strong><small>Value of items sold</small></div>
+        <div className="moneyCard"><span>Money received</span><strong>{formatNaira(summary.received)}</strong><small>Cash already paid</small></div>
+        <div className="moneyCard"><span>Still owed</span><strong>{formatNaira(summary.outstanding)}</strong><small>Customers have not paid this yet</small></div>
+        <div className="moneyCard"><span>Expenses</span><strong>{formatNaira(summary.expenses)}</strong><small>Money spent from the shop</small></div>
       </section>
 
       <section className="panel secondaryPanel">
-        <h2>Outstanding payments</h2>
+        <h2>Money still owed</h2>
         {outstanding.length === 0 ? (
-          <p className="muted">Nothing outstanding.</p>
+          <p className="muted">Nobody owes money right now.</p>
         ) : (
           <div className="balanceList">
             {outstanding.map((sale) => (
