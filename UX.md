@@ -145,3 +145,16 @@ Money should use:
 - Expenses = money spent from the shop
 
 Prefer “Still owed” over “Outstanding” in primary UI because it is clearer for non-technical users.
+
+## Role-Specific Home
+Owners retain the four primary actions and money summary.
+
+Staff see only the primary workflows they are permitted to use:
+- Sell Item
+- Add Stock
+- Inventory
+
+Do not show staff the owner money summary, Money action, product-creation controls, or staff-management controls.
+
+The Staff screen is secondary owner-only navigation. Adding staff should require only name and email. Until magic-link or Google sign-in is added, the invited person creates or signs in to an account using the exact invited email.
+
