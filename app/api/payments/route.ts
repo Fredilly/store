@@ -1,13 +1,13 @@
 import { db } from "../../../lib/db";
 import { toMinor } from "../../../lib/money";
-import { requireTenant } from "../../../lib/tenant";
+import { requireOwner } from "../../../lib/tenant";
 
 export async function POST(request: Request) {
   let tenant;
   try {
-    tenant = await requireTenant(request.headers);
+    tenant = await requireOwner(request.headers);
   } catch {
-    return Response.redirect(new URL("/login", request.url), 303);
+    return Response.redirect(new URL("/", request.url), 303);
   }
 
   const form = await request.formData();

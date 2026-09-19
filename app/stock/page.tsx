@@ -18,7 +18,11 @@ export default async function StockPage() {
       <section className="panel">
         <h2>Add stock</h2>
         {variants.length === 0 ? (
-          <p className="muted">Create your first item below.</p>
+          <p className="muted">
+            {tenant.role === "OWNER"
+              ? "Create your first item below."
+              : "Ask the owner to create an item first."}
+          </p>
         ) : (
           <form action="/api/stock" method="post" className="form">
             <label>
@@ -44,28 +48,30 @@ export default async function StockPage() {
         )}
       </section>
 
-      <section className="panel secondaryPanel">
-        <h2>New item</h2>
-        <form action="/api/products" method="post" className="form">
-          <label>
-            Item name
-            <input name="name" placeholder="School Uniform" required />
-          </label>
-          <label>
-            Size / class, optional
-            <input name="variant_name" placeholder="Size 10" />
-          </label>
-          <label>
-            Category, optional
-            <input name="category" placeholder="Uniform" />
-          </label>
-          <label>
-            Selling price
-            <input name="selling_price" inputMode="decimal" min="0.01" step="0.01" type="number" placeholder="8000" required />
-          </label>
-          <button type="submit" className="buttonSecondary">Create item</button>
-        </form>
-      </section>
+      {tenant.role === "OWNER" && (
+        <section className="panel secondaryPanel">
+          <h2>New item</h2>
+          <form action="/api/products" method="post" className="form">
+            <label>
+              Item name
+              <input name="name" placeholder="School Uniform" required />
+            </label>
+            <label>
+              Size / class, optional
+              <input name="variant_name" placeholder="Size 10" />
+            </label>
+            <label>
+              Category, optional
+              <input name="category" placeholder="Uniform" />
+            </label>
+            <label>
+              Selling price
+              <input name="selling_price" inputMode="decimal" min="0.01" step="0.01" type="number" placeholder="8000" required />
+            </label>
+            <button type="submit" className="buttonSecondary">Create item</button>
+          </form>
+        </section>
+      )}
     </main>
   );
 }

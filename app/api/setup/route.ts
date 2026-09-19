@@ -7,7 +7,8 @@ export async function POST(request: Request) {
     return Response.redirect(new URL("/login", request.url), 303);
   }
 
-  const existing = await db()
+  const database = db();
+  const existing = await database
     .prepare(
       "SELECT organization_id FROM organization_members WHERE user_id = ? AND status = 'ACTIVE' LIMIT 1"
     )
@@ -15,6 +16,17 @@ export async function POST(request: Request) {
     .first<{ organization_id: string }>();
 
   if (existing) {
+    return Response.redirect(new URL("/", request.url), 303);
+  }
+
+  const invited = await database
+    .prepare(
+      "SELECT id FROM staff_invites WHERE email = ? AND status = 'PENDING' LIMIT 1"
+    )
+    .bind(session.user.email.trim().toLowerCase())
+    .first<{ id: string }>();
+
+  if (invited) {
     return Response.redirect(new URL("/", request.url), 303);
   }
 
@@ -26,7 +38,6 @@ export async function POST(request: Request) {
   }
 
   const organizationId = crypto.randomUUID();
-  const database = db();
 
   await database.batch([
     database

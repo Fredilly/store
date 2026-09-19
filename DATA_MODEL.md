@@ -227,3 +227,22 @@ The older bootstrap `users` table from migration 0001 is removed by the auth mig
 The authenticated session gives the user ID. The server resolves the active `organization_members` row and uses its `organization_id` for all tenant-owned queries and writes.
 
 Client-provided organization IDs are never authorization evidence.
+
+## Staff Invitations
+`staff_invites` represents pending owner-issued invitations before a Better Auth user is linked to a school.
+
+Fields include:
+- id
+- organization_id
+- normalized email
+- name
+- status: PENDING | ACCEPTED | REVOKED
+- invited_by_user_id
+- accepted_by_user_id optional
+- created_at
+- accepted_at optional
+
+A school may have only one pending invite for the same normalized email. When the matching authenticated email is accepted, the system creates an `organization_members` row with role STAFF and records the acceptance in the audit log.
+
+Staff membership is deactivated by changing membership status, not deleting historical identity or transactions.
+
