@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { authClient } from "../../lib/auth-client";
 
 export default function LoginPage() {
@@ -8,13 +8,28 @@ export default function LoginPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const [googleEnabled, setGoogleEnabled] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/auth-capabilities", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((data) => setGoogleEnabled(Boolean(data.google)))
+      .catch(() => setGoogleEnabled(false));
+  }, []);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setBusy(true);
     setMessage("");
+
+    if (mode === "signup" && password !== confirmPassword) {
+      setMessage("Passwords do not match.");
+      return;
+    }
+
+    setBusy(true);
 
     const result =
       mode === "signup"
@@ -31,6 +46,21 @@ export default function LoginPage() {
     window.location.href = "/";
   }
 
+  async function signInWithGoogle() {
+    setBusy(true);
+    setMessage("");
+
+    const result = await authClient.signIn.social({
+      provider: "google",
+      callbackURL: "/",
+    });
+
+    if (result?.error) {
+      setBusy(false);
+      setMessage(result.error.message || "Could not sign in with Google.");
+    }
+  }
+
   return (
     <main className="authShell">
       <section className="authCard">
@@ -41,6 +71,20 @@ export default function LoginPage() {
             ? "Sign in to your school."
             : "Use the email your school owner invited, or create a new school."}
         </p>
+
+        {googleEnabled && (
+          <>
+            <button
+              className="buttonSecondary"
+              disabled={busy}
+              type="button"
+              onClick={signInWithGoogle}
+            >
+              Continue with Google
+            </button>
+            <p className="muted">or use email and password</p>
+          </>
+        )}
 
         <form className="form authForm" onSubmit={submit}>
           {mode === "signup" && (
@@ -79,6 +123,20 @@ export default function LoginPage() {
             />
           </label>
 
+          {mode === "signup" && (
+            <label>
+              Confirm password
+              <input
+                autoComplete="new-password"
+                minLength={8}
+                type="password"
+                value={confirmPassword}
+                onChange={(event) => setConfirmPassword(event.target.value)}
+                required
+              />
+            </label>
+          )}
+
           {message && <p className="formError">{message}</p>}
 
           <button disabled={busy} type="submit">
@@ -90,12 +148,20 @@ export default function LoginPage() {
           </button>
         </form>
 
+        {mode === "signin" && (
+          <a className="textButton" href="/forgot-password">
+            Forgot password?
+          </a>
+        )}
+
         <button
           className="textButton"
           type="button"
           onClick={() => {
             setMode(mode === "signin" ? "signup" : "signin");
             setMessage("");
+            setPassword("");
+            setConfirmPassword("");
           }}
         >
           {mode === "signin"
