@@ -125,9 +125,10 @@ Suggested fields:
 - created_at
 - voided_at optional
 
+Current:
+- optional customer/student/parent name for outstanding balances
+
 Optional later:
-- customer name
-- student name
 - class
 - reference/note
 

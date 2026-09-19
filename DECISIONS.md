@@ -59,3 +59,11 @@ Reason: QR can make mobile entry faster later, but the manual workflow must firs
 Decision: This is an inventory/sales ledger, not a complete accounting, school management, or ERP system.
 
 Add adjacent modules only after real usage demonstrates demand.
+
+
+## 2026-09-19: Temporary Single-Owner Bootstrap
+Decision: The first database-backed preview uses the seeded organization ID `org_default` until authentication and organization membership are wired.
+
+Reason: This lets the inventory, sales, payment, expense, and audit ledger be tested immediately without weakening the final multi-tenant schema.
+
+Constraint: Do not treat `org_default` as the final authorization model and do not load sensitive real-school data until owner authentication and server-side membership scoping are enabled.
