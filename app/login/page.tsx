@@ -15,8 +15,8 @@ export default function LoginPage() {
 
   useEffect(() => {
     fetch("/api/auth-capabilities", { cache: "no-store" })
-      .then((response) => response.json())
-      .then((data: { google?: boolean }) => setGoogleEnabled(Boolean(data.google)))
+      .then(async (response) => (await response.json()) as { google?: boolean })
+      .then((data) => setGoogleEnabled(Boolean(data.google)))
       .catch(() => setGoogleEnabled(false));
   }, []);
 
