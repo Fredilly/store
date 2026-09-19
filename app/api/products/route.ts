@@ -1,7 +1,15 @@
-import { DEFAULT_ORG_ID, db } from "../../../lib/db";
+import { db } from "../../../lib/db";
 import { toMinor } from "../../../lib/money";
+import { requireTenant } from "../../../lib/tenant";
 
 export async function POST(request: Request) {
+  let tenant;
+  try {
+    tenant = await requireTenant(request.headers);
+  } catch {
+    return Response.redirect(new URL("/login", request.url), 303);
+  }
+
   const form = await request.formData();
   const name = String(form.get("name") ?? "").trim();
   const variantName = String(form.get("variant_name") ?? "").trim();
@@ -19,15 +27,16 @@ export async function POST(request: Request) {
   await database.batch([
     database.prepare(
       "INSERT INTO products (id, organization_id, name, category) VALUES (?, ?, ?, ?)"
-    ).bind(productId, DEFAULT_ORG_ID, name, category || null),
+    ).bind(productId, tenant.orgId, name, category || null),
     database.prepare(
       "INSERT INTO product_variants (id, organization_id, product_id, variant_name, selling_price_minor) VALUES (?, ?, ?, ?, ?)"
-    ).bind(variantId, DEFAULT_ORG_ID, productId, variantName || null, sellingPriceMinor),
+    ).bind(variantId, tenant.orgId, productId, variantName || null, sellingPriceMinor),
     database.prepare(
-      "INSERT INTO audit_events (id, organization_id, event_type, entity_type, entity_id, metadata_json) VALUES (?, ?, 'PRODUCT_CREATED', 'product_variant', ?, ?)"
+      "INSERT INTO audit_events (id, organization_id, actor_user_id, event_type, entity_type, entity_id, metadata_json) VALUES (?, ?, ?, 'PRODUCT_CREATED', 'product_variant', ?, ?)"
     ).bind(
       crypto.randomUUID(),
-      DEFAULT_ORG_ID,
+      tenant.orgId,
+      tenant.userId,
       variantId,
       JSON.stringify({ name, variantName, sellingPriceMinor })
     ),

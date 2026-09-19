@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { listOutstandingSales, moneySummary } from "../../lib/queries";
 import { formatNaira } from "../../lib/money";
+import { requirePageTenant } from "../../lib/tenant";
 
 export default async function MoneyPage() {
+  const tenant = await requirePageTenant();
   const [summary, outstanding] = await Promise.all([
-    moneySummary(),
-    listOutstandingSales(),
+    moneySummary(tenant.orgId),
+    listOutstandingSales(tenant.orgId),
   ]);
 
   return (
@@ -17,22 +19,10 @@ export default async function MoneyPage() {
       </div>
 
       <section className="moneyGrid">
-        <div className="moneyCard">
-          <span>Sales</span>
-          <strong>{formatNaira(summary.sales)}</strong>
-        </div>
-        <div className="moneyCard">
-          <span>Money received</span>
-          <strong>{formatNaira(summary.received)}</strong>
-        </div>
-        <div className="moneyCard">
-          <span>Outstanding</span>
-          <strong>{formatNaira(summary.outstanding)}</strong>
-        </div>
-        <div className="moneyCard">
-          <span>Expenses</span>
-          <strong>{formatNaira(summary.expenses)}</strong>
-        </div>
+        <div className="moneyCard"><span>Sales</span><strong>{formatNaira(summary.sales)}</strong></div>
+        <div className="moneyCard"><span>Money received</span><strong>{formatNaira(summary.received)}</strong></div>
+        <div className="moneyCard"><span>Outstanding</span><strong>{formatNaira(summary.outstanding)}</strong></div>
+        <div className="moneyCard"><span>Expenses</span><strong>{formatNaira(summary.expenses)}</strong></div>
       </section>
 
       <section className="panel secondaryPanel">
@@ -49,16 +39,7 @@ export default async function MoneyPage() {
                   <span>Balance {formatNaira(sale.balance_minor)}</span>
                 </div>
                 <div className="balancePay">
-                  <input
-                    aria-label="Payment amount"
-                    name="amount"
-                    inputMode="decimal"
-                    min="0.01"
-                    step="0.01"
-                    type="number"
-                    placeholder="Amount"
-                    required
-                  />
+                  <input aria-label="Payment amount" name="amount" inputMode="decimal" min="0.01" step="0.01" type="number" placeholder="Amount" required />
                   <button type="submit">Pay</button>
                 </div>
               </form>
@@ -70,18 +51,9 @@ export default async function MoneyPage() {
       <section className="panel secondaryPanel">
         <h2>Record expense</h2>
         <form action="/api/expenses" method="post" className="form">
-          <label>
-            Description
-            <input name="description" placeholder="Transport" required />
-          </label>
-          <label>
-            Amount
-            <input name="amount" inputMode="decimal" min="0.01" step="0.01" type="number" placeholder="0" required />
-          </label>
-          <label>
-            Category, optional
-            <input name="category" placeholder="Supplies" />
-          </label>
+          <label>Description<input name="description" placeholder="Transport" required /></label>
+          <label>Amount<input name="amount" inputMode="decimal" min="0.01" step="0.01" type="number" placeholder="0" required /></label>
+          <label>Category, optional<input name="category" placeholder="Supplies" /></label>
           <button type="submit" className="buttonSecondary">Save expense</button>
         </form>
       </section>

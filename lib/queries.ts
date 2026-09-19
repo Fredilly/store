@@ -1,4 +1,4 @@
-import { DEFAULT_ORG_ID, db } from "./db";
+import { db } from "./db";
 
 export type VariantOption = {
   id: string;
@@ -16,7 +16,7 @@ export type OutstandingSale = {
   created_at: string;
 };
 
-export async function listVariants(): Promise<VariantOption[]> {
+export async function listVariants(orgId: string): Promise<VariantOption[]> {
   const result = await db()
     .prepare(
       `SELECT
@@ -38,13 +38,13 @@ export async function listVariants(): Promise<VariantOption[]> {
       GROUP BY v.id, p.name, v.variant_name, v.selling_price_minor
       ORDER BY p.name, v.variant_name`
     )
-    .bind(DEFAULT_ORG_ID)
+    .bind(orgId)
     .all<VariantOption>();
 
   return result.results.map((row) => ({ ...row, stock: Number(row.stock) }));
 }
 
-export async function moneySummary() {
+export async function moneySummary(orgId: string) {
   const row = await db()
     .prepare(
       `SELECT
@@ -52,7 +52,7 @@ export async function moneySummary() {
         COALESCE((SELECT SUM(amount_minor) FROM payments WHERE organization_id = ?), 0) AS received,
         COALESCE((SELECT SUM(amount_minor) FROM expenses WHERE organization_id = ?), 0) AS expenses`
     )
-    .bind(DEFAULT_ORG_ID, DEFAULT_ORG_ID, DEFAULT_ORG_ID)
+    .bind(orgId, orgId, orgId)
     .first<{ sales: number; received: number; expenses: number }>();
 
   const sales = Number(row?.sales ?? 0);
@@ -67,7 +67,7 @@ export async function moneySummary() {
   };
 }
 
-export async function listOutstandingSales(): Promise<OutstandingSale[]> {
+export async function listOutstandingSales(orgId: string): Promise<OutstandingSale[]> {
   const result = await db()
     .prepare(
       `SELECT
@@ -107,7 +107,7 @@ export async function listOutstandingSales(): Promise<OutstandingSale[]> {
       ORDER BY s.created_at DESC
       LIMIT 50`
     )
-    .bind(DEFAULT_ORG_ID)
+    .bind(orgId)
     .all<OutstandingSale>();
 
   return result.results.map((row) => ({

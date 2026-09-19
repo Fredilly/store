@@ -1,7 +1,15 @@
-import { DEFAULT_ORG_ID, db } from "../../../lib/db";
+import { db } from "../../../lib/db";
 import { toMinor } from "../../../lib/money";
+import { requireTenant } from "../../../lib/tenant";
 
 export async function POST(request: Request) {
+  let tenant;
+  try {
+    tenant = await requireTenant(request.headers);
+  } catch {
+    return Response.redirect(new URL("/login", request.url), 303);
+  }
+
   const form = await request.formData();
   const saleId = String(form.get("sale_id") ?? "");
   const amountMinor = toMinor(form.get("amount"));
@@ -25,7 +33,7 @@ export async function POST(request: Request) {
         AND s.status = 'COMPLETED'
       GROUP BY s.id, s.total_minor`
     )
-    .bind(saleId, DEFAULT_ORG_ID)
+    .bind(saleId, tenant.orgId)
     .first<{ total_minor: number; paid_minor: number }>();
 
   if (!sale) {
@@ -40,13 +48,14 @@ export async function POST(request: Request) {
   const paymentId = crypto.randomUUID();
   await database.batch([
     database.prepare(
-      "INSERT INTO payments (id, organization_id, sale_id, amount_minor) VALUES (?, ?, ?, ?)"
-    ).bind(paymentId, DEFAULT_ORG_ID, saleId, amountMinor),
+      "INSERT INTO payments (id, organization_id, sale_id, amount_minor, received_by_user_id) VALUES (?, ?, ?, ?, ?)"
+    ).bind(paymentId, tenant.orgId, saleId, amountMinor, tenant.userId),
     database.prepare(
-      "INSERT INTO audit_events (id, organization_id, event_type, entity_type, entity_id, metadata_json) VALUES (?, ?, 'PAYMENT_RECORDED', 'payment', ?, ?)"
+      "INSERT INTO audit_events (id, organization_id, actor_user_id, event_type, entity_type, entity_id, metadata_json) VALUES (?, ?, ?, 'PAYMENT_RECORDED', 'payment', ?, ?)"
     ).bind(
       crypto.randomUUID(),
-      DEFAULT_ORG_ID,
+      tenant.orgId,
+      tenant.userId,
       paymentId,
       JSON.stringify({ saleId, amountMinor })
     ),

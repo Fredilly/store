@@ -230,3 +230,17 @@ The first version succeeds if the owner can use it without technical help to:
 - understand today's money
 - identify who recorded each transaction
 - recover records even if a phone or notebook is lost
+
+
+## Authentication and Tenant Isolation
+Owner authentication uses Better Auth with email/password credentials stored in D1.
+
+After sign-in:
+- the session identifies the user
+- server-side membership lookup resolves the school organization
+- reads and writes use that organization ID
+- browser-supplied organization IDs are not trusted
+
+A new owner creates an account, then completes a one-screen school setup flow. The school workspace is created in `organizations` and linked through `organization_members`.
+
+`BETTER_AUTH_SECRET` must be configured as a Cloudflare Worker secret before real use.
