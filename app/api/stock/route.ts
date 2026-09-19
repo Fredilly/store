@@ -48,5 +48,5 @@ export async function POST(request: Request) {
     ),
   ]);
 
-  return Response.redirect(new URL("/stock?saved=1", request.url), 303);
+  return Response.redirect(new URL("/?success=stock", request.url), 303);
 }
