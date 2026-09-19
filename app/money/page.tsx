@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { listOutstandingSales, moneySummary } from "../../lib/queries";
 import { formatNaira } from "../../lib/money";
-import { requirePageTenant } from "../../lib/tenant";
+import { requirePageOwner } from "../../lib/tenant";
 
 export default async function MoneyPage() {
-  const tenant = await requirePageTenant();
+  const tenant = await requirePageOwner();
   const [summary, outstanding] = await Promise.all([
     moneySummary(tenant.orgId),
     listOutstandingSales(tenant.orgId),
