@@ -210,3 +210,20 @@ Examples:
 Prefer soft deactivation for products and staff.
 
 Do not cascade-delete historical sales, payments, stock movements, or audit records because a product or user is deactivated.
+
+
+## Authentication Tables
+Better Auth owns these D1 tables:
+- `user`
+- `session`
+- `account`
+- `verification`
+
+`organization_members.user_id` references Better Auth's `user.id`.
+
+The older bootstrap `users` table from migration 0001 is removed by the auth migration and must not be reintroduced.
+
+## Tenant Resolution
+The authenticated session gives the user ID. The server resolves the active `organization_members` row and uses its `organization_id` for all tenant-owned queries and writes.
+
+Client-provided organization IDs are never authorization evidence.
