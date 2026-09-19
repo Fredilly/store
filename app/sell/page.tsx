@@ -6,6 +6,7 @@ import { requirePageTenant } from "../../lib/tenant";
 export default async function SellPage() {
   const tenant = await requirePageTenant();
   const variants = (await listVariants(tenant.orgId)).filter((item) => item.stock > 0);
+  const submissionKey = crypto.randomUUID();
 
   return (
     <main className="shell">
@@ -25,6 +26,7 @@ export default async function SellPage() {
           </>
         ) : (
           <form action="/api/sales" method="post" className="form">
+            <input type="hidden" name="submission_key" value={submissionKey} />
             <label>
               Item
               <select name="variant_id" required>
