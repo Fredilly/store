@@ -28,18 +28,18 @@ export default function LoginPage() {
       return;
     }
 
-    window.location.href = mode === "signup" ? "/setup" : "/";
+    window.location.href = "/";
   }
 
   return (
     <main className="authShell">
       <section className="authCard">
         <p className="eyebrow">School Ledger</p>
-        <h1>{mode === "signin" ? "Welcome back" : "Create owner account"}</h1>
+        <h1>{mode === "signin" ? "Welcome back" : "Create account"}</h1>
         <p className="muted">
           {mode === "signin"
             ? "Sign in to your school."
-            : "Create the first owner account for your school."}
+            : "Use the email your school owner invited, or create a new school."}
         </p>
 
         <form className="form authForm" onSubmit={submit}>
@@ -99,7 +99,7 @@ export default function LoginPage() {
           }}
         >
           {mode === "signin"
-            ? "First time? Create owner account"
+            ? "First time? Create account"
             : "Already have an account? Sign in"}
         </button>
       </section>
