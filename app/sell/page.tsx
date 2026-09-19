@@ -40,6 +40,11 @@ export default async function SellPage() {
             </label>
 
             <label>
+              Student / parent, optional
+              <input name="customer_name" autoComplete="off" placeholder="Name" />
+            </label>
+
+            <label>
               Amount paid
               <input name="amount_paid" inputMode="decimal" min="0" step="0.01" type="number" placeholder="Leave blank if fully paid" />
             </label>
