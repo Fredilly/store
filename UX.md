@@ -158,3 +158,21 @@ Do not show staff the owner money summary, Money action, product-creation contro
 
 The Staff screen is secondary owner-only navigation. Adding staff should require only name and email. Until magic-link or Google sign-in is added, the invited person creates or signs in to an account using the exact invited email.
 
+## Sign-In and Recovery
+Preferred sign-in order:
+
+1. Continue with Google when available
+2. Email + password
+
+Email/password account creation requires:
+- name
+- email
+- password
+- confirm password
+
+The form must block account creation when the two password entries do not match.
+
+Sign-in includes a clear Forgot password? action. Password-reset requests always show a generic confirmation so the UI does not reveal whether an email address has an account.
+
+Magic link is deferred for now. Google sign-in plus password recovery keeps the surface simpler while still providing an easy recovery path.
+
