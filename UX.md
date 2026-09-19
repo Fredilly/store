@@ -115,3 +115,17 @@ Good:
 `Only 2 are in stock. Reduce the quantity or add stock first.`
 
 Never expose database or stack errors to end users.
+
+
+## Quick Return Pattern
+For the two most frequent write actions:
+- Add Stock
+- Sell Item
+
+After a successful save, return directly to Home and show a brief confirmation banner.
+
+Do not require the owner to manually navigate back after each routine transaction.
+
+Inventory and Money remain separate views because they are primarily for checking information rather than rapid repeated entry.
+
+Creating a brand-new product may remain on the Add Stock screen so stock can be added immediately after creation.

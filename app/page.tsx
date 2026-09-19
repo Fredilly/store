@@ -10,12 +10,30 @@ const actions = [
   { label: "Money", href: "/money", detail: "Sales, received, outstanding" },
 ];
 
-export default async function Home() {
+const successMessages: Record<string, string> = {
+  sale: "Sale recorded.",
+  stock: "Stock added.",
+};
+
+export default async function Home({
+  searchParams,
+}: {
+  searchParams?: Promise<{ success?: string }>;
+}) {
   const tenant = await requirePageTenant();
   const summary = await moneySummary(tenant.orgId);
+  const params = (await searchParams) ?? {};
+  const success = params.success ? successMessages[params.success] : undefined;
 
   return (
     <main className="shell">
+      {success && (
+        <div className="successBanner" role="status">
+          <span aria-hidden="true">✓</span>
+          <strong>{success}</strong>
+        </div>
+      )}
+
       <header className="header">
         <div className="headerRow">
           <div>
@@ -24,7 +42,7 @@ export default async function Home() {
           </div>
           <SignOutButton />
         </div>
-        <p className="muted">What do you want to record?</p>
+        <p className="muted">What do you want to do?</p>
       </header>
 
       <section className="summary" aria-label="Money summary">

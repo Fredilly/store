@@ -401,3 +401,31 @@ button {
   margin-top: 0;
   white-space: nowrap;
 }
+
+
+.successBanner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 18px;
+  padding: 14px 16px;
+  border: 1px solid #b8dec3;
+  border-radius: 16px;
+  background: #eef9f1;
+  color: #175c2d;
+}
+
+.successBanner span {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: #d8f1df;
+  font-weight: 900;
+}
+
+.successBanner strong {
+  font-size: 1rem;
+}
