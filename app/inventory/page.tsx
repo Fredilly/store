@@ -26,9 +26,9 @@ export default async function InventoryPage() {
             <article className="inventoryRow" key={item.id}>
               <div>
                 <strong>{item.label}</strong>
-                <span>{formatNaira(item.selling_price_minor)}</span>
+                <span>Selling price · {formatNaira(item.selling_price_minor)}</span>
               </div>
-              <b className={item.stock <= 2 ? "lowStock" : ""}>{item.stock}</b>
+              <div className="stockCount"><b className={item.stock <= 2 ? "lowStock" : ""}>{item.stock}</b><span>in stock</span></div>
             </article>
           ))
         )}
