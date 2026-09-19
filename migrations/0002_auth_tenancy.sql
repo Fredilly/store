@@ -54,6 +54,7 @@ CREATE TABLE IF NOT EXISTS "verification" (
 CREATE INDEX IF NOT EXISTS "verification_identifier_idx" ON "verification"("identifier");
 
 DROP TABLE IF EXISTS organization_members;
+DROP TABLE IF EXISTS users;
 
 CREATE TABLE organization_members (
   organization_id TEXT NOT NULL,
