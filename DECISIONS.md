@@ -80,3 +80,17 @@ Implementation:
 - Every protected page resolves its organization from the authenticated session.
 - Every core mutation re-checks organization membership server-side.
 - `org_default` remains only as legacy bootstrap data from migration 0001 and is no longer used by application reads or writes.
+
+## 2026-09-19: Google First, Password Fallback
+Decision: Offer Google sign-in as the simplest path when configured, while retaining Better Auth email/password with password confirmation and self-service reset.
+
+Reason: Google reduces password friction for common users, while email/password provides a provider-independent recovery and fallback path.
+
+Decision: Use Resend for transactional authentication email from the verified Article6 domain.
+
+Reason: Password reset and welcome email need reliable transactional delivery without coupling authentication to personal Gmail.
+
+Decision: Defer magic-link sign-in.
+
+Reason: Google plus email/password recovery already covers the primary simplicity and recovery needs. Add another passwordless method only if real users demonstrate a need.
+
