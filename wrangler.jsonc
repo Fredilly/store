@@ -3,7 +3,10 @@
   "name": "store",
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-09-19",
-  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "compatibility_flags": [
+    "nodejs_compat",
+    "global_fetch_strictly_public"
+  ],
   "keep_vars": true,
   "routes": [
     {
@@ -24,5 +27,9 @@
   ],
   "observability": {
     "enabled": true
+  },
+  "vars": {
+    "BETTER_AUTH_URL": "https://store.article6.org",
+    "EMAIL_FROM": "School Ledger <no-reply@article6.org>"
   }
 }
