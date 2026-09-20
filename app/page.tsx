@@ -25,7 +25,7 @@ function FirstRun({
   if (productCount === 0) {
     return (
       <section className="firstRun" aria-label="Getting started">
-        <p className="firstRunStep">Step 1 of 3</p>
+        <p className="firstRunStep">Step 1 of 2</p>
         <h2>Let’s add your first item</h2>
         <p>Add something you sell, like a uniform or textbook. You only need a name and selling price.</p>
         <a className="firstRunAction" href="/stock#new-item">Add your first item</a>
@@ -37,7 +37,7 @@ function FirstRun({
     return (
       <section className="firstRun" aria-label="Getting started">
         <div className="firstRunDone">✓ First item added</div>
-        <p className="firstRunStep">Step 2 of 3</p>
+        <p className="firstRunStep">Step 2 of 2</p>
         <h2>Now add some stock</h2>
         <p>Tell the app how many you have. That’s all you need before you can sell.</p>
         <a className="firstRunAction" href="/stock">Add stock</a>
@@ -64,14 +64,24 @@ export default async function Home({
   const tenant = await requirePageTenant();
   const params = (await searchParams) ?? {};
   const progress = tenant.role === "OWNER" ? await onboardingProgress(tenant.orgId) : null;
-  const isFirstRun = Boolean(progress && progress.saleCount === 0);
+  const isFirstRun = Boolean(progress && (progress.productCount === 0 || progress.stockUnits <= 0));
+  const showOptionalFirstSale = Boolean(
+    progress &&
+      progress.productCount > 0 &&
+      progress.stockUnits > 0 &&
+      progress.saleCount === 0
+  );
   const summary = tenant.role === "OWNER" && !isFirstRun ? await moneySummary(tenant.orgId) : null;
   const success =
-    params.success === "sale" && progress?.saleCount === 1
-      ? "First sale recorded. You’re all set!"
-      : params.success
-        ? successMessages[params.success]
-        : undefined;
+    params.success === "item" && progress?.productCount === 1
+      ? "Nice — your first item is ready ✨"
+      : params.success === "stock" && progress?.saleCount === 0
+        ? "Great — stock added. You’re ready to go 🎉"
+        : params.success === "sale" && progress?.saleCount === 1
+          ? "First sale recorded 🎉"
+          : params.success
+            ? successMessages[params.success]
+            : undefined;
   const actions =
     tenant.role === "OWNER"
       ? [
@@ -99,7 +109,7 @@ export default async function Home({
           <SignOutButton />
         </div>
         <p className="muted">
-          {isFirstRun ? "We’ll get you set up in three simple steps." : "What do you want to do?"}
+          {isFirstRun ? "We’ll get the basics ready in two simple steps." : "What do you want to do?"}
         </p>
       </header>
 
@@ -107,6 +117,16 @@ export default async function Home({
         <FirstRun productCount={progress.productCount} stockUnits={progress.stockUnits} />
       ) : (
         <>
+          {showOptionalFirstSale && (
+            <section className="firstSaleHint" aria-label="Optional first sale helper">
+              <div>
+                <strong>Ready when you are</strong>
+                <span>Your first sale can wait. When something sells, record it here.</span>
+              </div>
+              <a href="/sell">Record a sale →</a>
+            </section>
+          )}
+
           {summary && (
             <section className="summary" aria-label="Money summary">
               <div>
