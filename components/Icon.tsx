@@ -66,9 +66,8 @@ export function Icon({
     case "money":
       return (
         <svg {...common}>
-          <rect x="3" y="6" width="18" height="12" rx="2" />
-          <path d="M7 12h.01M17 12h.01" />
-          <circle cx="12" cy="12" r="2.5" />
+          <path d="M8 19V5l8 14V5" />
+          <path d="M6 10h12M6 14h12" />
         </svg>
       );
     case "activity":
