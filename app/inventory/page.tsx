@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Icon } from "../../components/Icon";
 import { listVariants } from "../../lib/queries";
 import { formatNaira } from "../../lib/money";
 import { requirePageTenant } from "../../lib/tenant";
@@ -10,7 +11,7 @@ export default async function InventoryPage() {
   return (
     <main className="shell">
       <div className="pageTop">
-        <Link className="back" href="/">← Home</Link>
+        <Link className="back" href="/"><Icon name="home" size={19} className="backIcon" /><span>Home</span></Link>
         <p className="eyebrow">Stock</p>
         <h1>What you have</h1>
       </div>
