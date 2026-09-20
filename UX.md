@@ -133,7 +133,17 @@ Do not require the owner to manually navigate back after each routine transactio
 
 Inventory and Money remain separate views because they are primarily for checking information rather than rapid repeated entry.
 
-Creating a brand-new product may remain on the Add Stock screen so stock can be added immediately after creation.
+Creating a brand-new item remains on the Add Stock screen.
+
+New item setup should stay plain-language and one-step:
+- Item name
+- Selling price
+- Size / class only if needed
+- Optional barcode
+- Starting stock
+- Optional cost price
+
+Do not require category, SKU, or other inventory jargon in the primary flow. Creating the item and its starting stock should commit together so the owner does not end up with a half-created item.
 
 
 ## Plain-Language Number Labels
