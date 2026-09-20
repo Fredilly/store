@@ -694,3 +694,203 @@ button {
     flex-direction: column;
   }
 }
+
+
+/* Mobile readability pass */
+body {
+  font-size: 18px;
+  line-height: 1.55;
+}
+
+.shell {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.back,
+.eyebrow,
+.form label,
+button,
+.inlineAction,
+.firstRunAction {
+  font-size: 1rem;
+}
+
+.back {
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+}
+
+h1 {
+  font-size: clamp(2.2rem, 10vw, 3.25rem);
+  line-height: 1.05;
+}
+
+h2 {
+  font-size: 1.35rem;
+  line-height: 1.25;
+}
+
+.muted,
+.scannerMessage,
+.firstRun > p:not(.firstRunStep) {
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.form {
+  gap: 20px;
+}
+
+.form label {
+  gap: 10px;
+  line-height: 1.35;
+}
+
+.form input,
+.form select,
+.balancePay input {
+  min-height: 58px;
+  font-size: 1.0625rem;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+button,
+.inlineAction,
+.firstRunAction {
+  min-height: 58px;
+}
+
+.action {
+  min-height: 104px;
+  padding: 20px 22px;
+}
+
+.action strong {
+  font-size: 1.45rem;
+}
+
+.action span {
+  margin-top: 6px;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.summary {
+  gap: 10px;
+}
+
+.summary div {
+  padding: 16px 14px;
+}
+
+.summary span {
+  min-height: 0;
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
+.summary strong {
+  margin-top: 6px;
+  font-size: 1.4rem;
+}
+
+.inventoryRow {
+  padding: 18px;
+}
+
+.inventoryRow strong {
+  font-size: 1.08rem;
+  line-height: 1.35;
+}
+
+.inventoryRow span {
+  font-size: 0.98rem;
+  line-height: 1.4;
+}
+
+.stockCount b {
+  font-size: 1.7rem;
+}
+
+.stockCount span {
+  font-size: 0.9rem;
+}
+
+.moneyCard span {
+  font-size: 1rem;
+}
+
+.moneyCard strong {
+  font-size: 2rem;
+}
+
+.moneyCard small {
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.successBanner,
+.messageBanner {
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.firstRunStep,
+.firstRunDone,
+.firstSaleHint span {
+  font-size: 0.95rem;
+}
+
+.firstSaleHint strong {
+  font-size: 1.05rem;
+}
+
+@media (max-width: 520px) {
+  .shell {
+    padding-top: 24px;
+    padding-bottom: 40px;
+  }
+
+  .summary {
+    grid-template-columns: 1fr;
+  }
+
+  .summary div {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .summary strong {
+    margin-top: 0;
+    text-align: right;
+  }
+
+  .ownerLinks {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .ownerLinks .inlineAction {
+    width: 100%;
+  }
+
+  .inventoryRow {
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
