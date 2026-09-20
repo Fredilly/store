@@ -10,15 +10,11 @@ type AuthEnv = {
   GOOGLE_CLIENT_SECRET?: string;
 };
 
-let authInstance: ReturnType<typeof betterAuth> | null = null;
-
 function runtimeEnv(): AuthEnv {
   return getCloudflareContext().env as unknown as AuthEnv;
 }
 
-export function getAuth() {
-  if (authInstance) return authInstance;
-
+function createAuth() {
   const runtime = runtimeEnv();
   const googleConfigured = Boolean(
     runtime.GOOGLE_CLIENT_ID && runtime.GOOGLE_CLIENT_SECRET
@@ -35,7 +31,7 @@ export function getAuth() {
     )
   );
 
-  authInstance = betterAuth({
+  return betterAuth({
     database: runtime.DB,
     baseURL: runtime.BETTER_AUTH_URL,
     trustedOrigins,
@@ -72,7 +68,13 @@ export function getAuth() {
       },
     },
   });
+}
 
+type AuthInstance = ReturnType<typeof createAuth>;
+let authInstance: AuthInstance | undefined;
+
+export function getAuth(): AuthInstance {
+  authInstance ??= createAuth();
   return authInstance;
 }
 
