@@ -139,5 +139,5 @@ export async function POST(request: Request) {
     throw error;
   }
 
-  return Response.redirect(new URL("/stock?created=1", request.url), 303);
+  return Response.redirect(new URL("/?success=item", request.url), 303);
 }
