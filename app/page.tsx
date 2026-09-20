@@ -1,12 +1,13 @@
 import { SignOutButton } from "../components/sign-out-button";
+import { Icon, type IconName } from "../components/Icon";
 import { formatNaira } from "../lib/money";
 import { moneySummary, onboardingProgress } from "../lib/queries";
 import { requirePageTenant } from "../lib/tenant";
 
-const baseActions = [
-  { label: "Sell Item", href: "/sell", detail: "Record a sale" },
-  { label: "Add Stock", href: "/stock", detail: "Record items received" },
-  { label: "Stock", href: "/inventory", detail: "See what you have" },
+const baseActions: Array<{ label: string; href: string; detail: string; icon: IconName }> = [
+  { label: "Sell Item", href: "/sell", detail: "Record a sale", icon: "sell" },
+  { label: "Add Stock", href: "/stock", detail: "Record items received", icon: "stockIn" },
+  { label: "Stock", href: "/inventory", detail: "See what you have", icon: "stock" },
 ];
 
 const successMessages: Record<string, string> = {
@@ -86,8 +87,8 @@ export default async function Home({
     tenant.role === "OWNER"
       ? [
           ...baseActions,
-          { label: "Money", href: "/money", detail: "Sold, received, still owed" },
-          { label: "Activity", href: "/activity", detail: "See who changed what" },
+          { label: "Money", href: "/money", detail: "Sold, received, still owed", icon: "money" as const },
+          { label: "Activity", href: "/activity", detail: "See who changed what", icon: "activity" as const },
         ]
       : baseActions;
 
@@ -147,6 +148,7 @@ export default async function Home({
           <section className="actions" aria-label="Main actions">
             {actions.map((action) => (
               <a className="action" href={action.href} key={action.href}>
+                <Icon name={action.icon} size={24} className="actionIcon" />
                 <strong>{action.label}</strong>
                 <span>{action.detail}</span>
               </a>
