@@ -66,6 +66,23 @@ jobs:
       - name: Deploy Worker
         run: npm run deploy
 
+      - name: Auth database integrity diagnostics
+        run: |
+          npx wrangler d1 execute store-db --remote --json --command '
+            SELECT
+              (SELECT COUNT(*) FROM "user") AS users,
+              (SELECT COUNT(*) FROM account WHERE providerId = "credential" AND password IS NOT NULL) AS credential_accounts,
+              (SELECT COUNT(*) FROM session) AS sessions,
+              (SELECT COUNT(*) FROM organization_members WHERE status = "ACTIVE") AS active_memberships,
+              (
+                SELECT COUNT(*)
+                FROM "user" u
+                LEFT JOIN account a
+                  ON a.userId = u.id
+                 AND a.providerId = "credential"
+                WHERE a.id IS NULL
+              ) AS users_without_credential;
+          '
 
       - name: Production smoke and runtime diagnostics
         run: |
@@ -96,6 +113,45 @@ jobs:
 
           if ! grep -q 'action="/api/login"' /tmp/store-body.html; then
             echo "Production login form is missing the server fallback."
+            exit 1
+          fi
+
+          if ! grep -q 'name="email"' /tmp/store-body.html || ! grep -q 'name="password"' /tmp/store-body.html; then
+            echo "Production login inputs are missing form field names."
+            exit 1
+          fi
+
+          curl -sS -D /tmp/store-http-headers.txt \
+            -o /dev/null \
+            http://store.article6.org/login
+
+          echo "=== HTTP LOGIN RESPONSE HEADERS ==="
+          cat /tmp/store-http-headers.txt || true
+
+          if ! grep -Eq "^HTTP/[0-9.]+ (301|302|307|308)" /tmp/store-http-headers.txt; then
+            echo "HTTP login page did not redirect to HTTPS."
+            exit 1
+          fi
+
+          if ! grep -Eiq "^location: https://store\.article6\.org/login" /tmp/store-http-headers.txt; then
+            echo "HTTP login redirect did not target HTTPS."
+            exit 1
+          fi
+
+          curl -sS -D /tmp/store-login-json-headers.txt \
+            -o /tmp/store-login-json-body.txt \
+            -X POST \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/x-www-form-urlencoded" \
+            --data "email=definitely-not-a-user%40example.invalid&password=definitely-wrong" \
+            https://store.article6.org/api/login
+
+          echo "=== INVALID LOGIN JSON RESPONSE ==="
+          cat /tmp/store-login-json-headers.txt || true
+          cat /tmp/store-login-json-body.txt || true
+
+          if ! grep -Eq "^HTTP/[0-9.]+ 401" /tmp/store-login-json-headers.txt; then
+            echo "Production invalid-login JSON path did not return 401."
             exit 1
           fi
 

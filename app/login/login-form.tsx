@@ -23,10 +23,16 @@ async function hasAuthenticatedSession() {
   return Boolean(data?.session && data?.user);
 }
 
-export function LoginForm({ initialMessage = "" }: { initialMessage?: string }) {
+export function LoginForm({
+  initialMessage = "",
+  initialEmail = "",
+}: {
+  initialMessage?: string;
+  initialEmail?: string;
+}) {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState(initialMessage);
@@ -34,13 +40,48 @@ export function LoginForm({ initialMessage = "" }: { initialMessage?: string }) 
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     if (mode === "signin") {
+      event.preventDefault();
+      setMessage("");
+      setBusy(true);
+
+      try {
+        const form = new FormData(event.currentTarget);
+        const response = await fetch("/api/login", {
+          method: "POST",
+          body: form,
+          credentials: "include",
+          headers: {
+            Accept: "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          const result = (await response.json().catch(() => null)) as
+            | { error?: string }
+            | null;
+
+          setMessage(
+            result?.error === "unavailable"
+              ? "Could not sign in. Please try again."
+              : "Incorrect email or password."
+          );
+          return;
+        }
+
+        window.location.assign("/");
+      } catch {
+        setMessage("Could not connect. Check your connection and try again.");
+      } finally {
+        setBusy(false);
+      }
+
       return;
     }
 
     event.preventDefault();
     setMessage("");
 
-    if (mode === "signup" && password !== confirmPassword) {
+    if (password !== confirmPassword) {
       setMessage("Passwords do not match.");
       return;
     }
@@ -99,6 +140,7 @@ export function LoginForm({ initialMessage = "" }: { initialMessage?: string }) 
             <input
               autoComplete="email"
               inputMode="email"
+              name="email"
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
@@ -111,6 +153,7 @@ export function LoginForm({ initialMessage = "" }: { initialMessage?: string }) 
             <input
               autoComplete={mode === "signin" ? "current-password" : "new-password"}
               minLength={8}
+              name="password"
               type="password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
