@@ -214,3 +214,19 @@ During first run:
 - never block the underlying workflows or data model
 
 The first sale is never required to finish setup. The normal home experience begins as soon as an item has stock.
+
+
+## Mobile Readability
+The default mobile experience must work for users who prefer larger text without requiring pinch-to-zoom.
+
+Rules:
+- default body text should be large and comfortably spaced
+- form fields and selects must use at least 16px text
+- primary tap targets should be at least 56px tall
+- helper text must remain readable and high contrast
+- money and stock numbers should stand out clearly
+- narrow phones should not squeeze three money values into tiny columns
+- preserve browser text scaling; never disable user zoom
+- support reduced-motion preferences
+- prefer simple visible labels such as “Stock” and “What you have” over inventory jargon when meaning stays clear
+- polish must not change ledger, permissions, or workflow behavior
