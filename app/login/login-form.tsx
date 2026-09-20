@@ -38,13 +38,13 @@ async function hasAuthenticatedSession() {
   return Boolean(data?.session && data?.user);
 }
 
-export function LoginForm() {
+export function LoginForm({ initialMessage = "" }: { initialMessage?: string }) {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(initialMessage);
   const [busy, setBusy] = useState(false);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -103,7 +103,7 @@ export function LoginForm() {
             : "Use the email your school owner invited, or create a new school."}
         </p>
 
-        <form className="form authForm" onSubmit={submit}>
+        <form action="/api/login" className="form authForm" method="post" onSubmit={submit}>
           {mode === "signup" && (
             <label>
               Your name
