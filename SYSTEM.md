@@ -166,20 +166,22 @@ Avoid:
 - repeated typing of product names
 - hidden required fields
 
-## QR-Ready Design
-QR scanning is not required for V1, but the data model must support it.
+## Barcode Scanning
+Barcode scanning is a V1 shortcut for the phone workflow and does not use a vision model or paid inference API.
 
-Each sellable product/variant should have a stable internal ID and may later have one or more scan codes.
+Each sellable product/variant has a stable internal ID and may have one or more scan-code aliases.
 
-Future QR workflow:
+Workflow:
 
-1. Scan code
-2. Product opens immediately
-3. Enter quantity
-4. Enter amount paid if different from total
-5. Save
+1. Scan barcode
+2. Resolve the code within the authenticated school
+3. Select the matching product variant
+4. Enter quantity and payment details as needed
+5. Save through the existing ledger mutation
 
-Do not make QR codes the primary identifier in the database. They are lookup aliases for stable internal IDs.
+If the code is unknown, an owner may create the item with that barcode prefilled. If camera access or decoding fails, manual item selection remains available.
+
+Do not make barcode or QR values the primary identifier in the database. They are lookup aliases for stable internal product variant IDs.
 
 ## Reliability Rules
 - Never trust calculated totals sent from the browser when the server can calculate them.
@@ -224,6 +226,7 @@ Build only:
 10. Staff accounts and basic roles
 11. Export/backup path
 12. Mobile polish
+13. Barcode scanning for stock and sales
 
 ## Explicitly Deferred
 - advanced accounting
@@ -232,7 +235,7 @@ Build only:
 - fee collection unrelated to shop inventory
 - analytics dashboards
 - native mobile apps
-- barcode/QR printing and scanning UI
+- barcode/QR label printing
 - purchase orders
 - supplier portal
 - offline-first sync
