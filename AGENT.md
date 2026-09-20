@@ -87,12 +87,15 @@ Staff UX may later use a simplified PIN flow, but PINs must:
 
 Do not share one anonymous staff login between multiple people if accountability is required.
 
-## QR/Barcode Future
-Prepare the schema for scan aliases now, but do not build scanning until the core manual flow is stable.
+## QR/Barcode Scanning
+Barcode scanning is an active mobile shortcut for Sell Item and Add Stock.
 
-A scan code should resolve to a product variant ID.
-
-The product variant ID remains the canonical identity.
+- Decode barcodes locally on the device/browser. Do not use paid vision APIs for normal barcode scanning.
+- Resolve every scan code server-side within the authenticated organization.
+- A scan code resolves to a product variant ID.
+- The product variant ID remains the canonical identity.
+- Manual item selection must always remain available when camera access or decoding fails.
+- An unknown barcode may prefill barcode assignment for owner-only item creation.
 
 ## Development Priorities
 Order of work:

@@ -50,10 +50,22 @@ Decision: Inventory is calculated from stock movements rather than maintained as
 
 Reason: Creates traceability and prevents silent historical rewriting.
 
-## 2026-09-19: QR Later, Schema Ready Now
-Decision: Do not build QR scanning in the first MVP, but add stable product variant IDs and support future scan aliases.
+## 2026-09-19: QR Later, Schema Ready Now (Superseded)
+Decision: Initially defer scanning while keeping stable product variant IDs and scan aliases ready.
 
-Reason: QR can make mobile entry faster later, but the manual workflow must first be correct and easy.
+Reason: The manual ledger workflow needed to become correct and stable first.
+
+## 2026-09-20: Zero-Cost Barcode Scanning
+Decision: Add barcode scanning to Sell Item and Add Stock now that the core manual flow and integrity gates are in place.
+
+Implementation:
+- decode common barcodes locally in the browser with the open-source ZXing browser library
+- do not call a vision model or paid barcode API
+- resolve scanned codes server-side within the authenticated organization
+- preserve manual item selection as the fallback
+- unknown barcodes may prefill owner-only item creation
+
+Reason: Scanning materially reduces typing and taps for the primary phone workflow without adding per-scan cost or weakening the ledger model.
 
 ## 2026-09-19: Product Scope
 Decision: This is an inventory/sales ledger, not a complete accounting, school management, or ERP system.

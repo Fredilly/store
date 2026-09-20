@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { listVariants } from "../../lib/queries";
 import { requirePageTenant } from "../../lib/tenant";
+import { BarcodeScanner } from "../../components/BarcodeScanner";
 
 export default async function StockPage() {
   const tenant = await requirePageTenant();
@@ -17,6 +18,10 @@ export default async function StockPage() {
 
       <section className="panel">
         <h2>Add stock</h2>
+        <BarcodeScanner
+          targetSelectId={variants.length > 0 ? "stock-variant" : undefined}
+          unknownBarcodeInputId={tenant.role === "OWNER" ? "new-item-barcode" : undefined}
+        />
         {variants.length === 0 ? (
           <p className="muted">
             {tenant.role === "OWNER"
@@ -27,7 +32,7 @@ export default async function StockPage() {
           <form action="/api/stock" method="post" className="form">
             <label>
               Item
-              <select name="variant_id" required>
+              <select id="stock-variant" name="variant_id" required>
                 {variants.map((item) => (
                   <option key={item.id} value={item.id}>
                     {item.label} · {item.stock} left
@@ -63,6 +68,10 @@ export default async function StockPage() {
             <label>
               Category, optional
               <input name="category" placeholder="Uniform" />
+            </label>
+            <label>
+              Barcode, optional
+              <input id="new-item-barcode" name="barcode" autoComplete="off" placeholder="Scan or enter barcode" />
             </label>
             <label>
               Selling price
