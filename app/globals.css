@@ -982,3 +982,33 @@ button,
     height: 31px;
   }
 }
+
+
+/* Larger internal form text for mobile readability */
+.form label {
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.form input,
+.form select,
+.balancePay input {
+  font-size: 1.125rem;
+}
+
+.form input::placeholder,
+.balancePay input::placeholder {
+  font-size: 1.05rem;
+}
+
+@media (max-width: 520px) {
+  .form label {
+    font-size: 1.18rem;
+  }
+
+  .form input,
+  .form select,
+  .balancePay input {
+    font-size: 1.15rem;
+  }
+}
