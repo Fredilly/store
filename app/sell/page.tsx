@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Icon } from "../../components/Icon";
 import { listVariants } from "../../lib/queries";
 import { formatNaira } from "../../lib/money";
 import { requirePageTenant } from "../../lib/tenant";
@@ -12,7 +13,7 @@ export default async function SellPage() {
   return (
     <main className="shell">
       <div className="pageTop">
-        <Link className="back" href="/">← Home</Link>
+        <Link className="back" href="/"><Icon name="home" size={19} className="backIcon" /><span>Home</span></Link>
         <p className="eyebrow">Sell Item</p>
         <h1>Record a sale</h1>
         <p className="muted">Leave amount paid blank when fully paid.</p>
