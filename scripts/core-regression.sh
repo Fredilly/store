@@ -61,6 +61,13 @@ run_sql "
     ('qa_variant_a', 'qa_org_a', 'qa_product_a', 'Default', 1000),
     ('qa_variant_b', 'qa_org_b', 'qa_product_b', 'Default', 2000);
 
+  INSERT INTO scan_codes (
+    id, organization_id, product_variant_id, code, code_type
+  )
+  VALUES
+    ('qa_barcode_a', 'qa_org_a', 'qa_variant_a', '1234567890123', 'BARCODE'),
+    ('qa_barcode_b', 'qa_org_b', 'qa_variant_b', '1234567890123', 'BARCODE');
+
   INSERT INTO stock_movements (
     id, organization_id, product_variant_id, movement_type,
     quantity_delta, created_by_user_id
@@ -219,6 +226,13 @@ expect_blocked   "cross-school payment"   "INSERT INTO payments (
   ) VALUES (
     'qa_cross_payment', 'qa_org_b', 'qa_sale_a', 100,
     'qa_owner_b', 'qa-cross-pay'
+  );"
+
+expect_blocked   "duplicate barcode in same school"   "INSERT INTO scan_codes (
+    id, organization_id, product_variant_id, code, code_type
+  ) VALUES (
+    'qa_barcode_duplicate', 'qa_org_a', 'qa_variant_a',
+    '1234567890123', 'BARCODE'
   );"
 
 expect_blocked   "duplicate sale submission"   "INSERT INTO sales (
