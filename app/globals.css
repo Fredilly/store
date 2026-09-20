@@ -599,3 +599,55 @@ button {
   font-size: 0.92rem;
   line-height: 1.4;
 }
+
+
+.firstRun {
+  padding: 26px 22px;
+  border: 1px solid #d9dfeb;
+  border-radius: 22px;
+  background: #fff;
+}
+
+.firstRunStep {
+  margin: 0 0 10px;
+  color: #2556d8;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.firstRun h2 {
+  margin-bottom: 10px;
+  font-size: 1.55rem;
+  letter-spacing: -0.025em;
+}
+
+.firstRun > p:not(.firstRunStep) {
+  margin: 0;
+  color: #686d75;
+  line-height: 1.5;
+}
+
+.firstRunDone {
+  display: inline-block;
+  margin-bottom: 16px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: #eef9f1;
+  color: #175c2d;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.firstRunAction {
+  display: flex;
+  min-height: 58px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 22px;
+  padding: 0 18px;
+  border-radius: 16px;
+  background: #2556d8;
+  color: white;
+  font-weight: 800;
+  text-align: center;
+}
