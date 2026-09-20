@@ -117,3 +117,32 @@ export async function listOutstandingSales(orgId: string): Promise<OutstandingSa
     balance_minor: Number(row.balance_minor),
   }));
 }
+
+
+export type OnboardingProgress = {
+  productCount: number;
+  stockUnits: number;
+  saleCount: number;
+};
+
+export async function onboardingProgress(orgId: string): Promise<OnboardingProgress> {
+  const row = await db()
+    .prepare(
+      `SELECT
+        (SELECT COUNT(*) FROM product_variants WHERE organization_id = ? AND active = 1) AS product_count,
+        COALESCE((
+          SELECT SUM(quantity_delta)
+          FROM stock_movements
+          WHERE organization_id = ?
+        ), 0) AS stock_units,
+        (SELECT COUNT(*) FROM sales WHERE organization_id = ? AND status = 'COMPLETED') AS sale_count`
+    )
+    .bind(orgId, orgId, orgId)
+    .first<{ product_count: number; stock_units: number; sale_count: number }>();
+
+  return {
+    productCount: Number(row?.product_count ?? 0),
+    stockUnits: Number(row?.stock_units ?? 0),
+    saleCount: Number(row?.sale_count ?? 0),
+  };
+}

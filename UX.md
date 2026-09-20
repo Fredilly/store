@@ -191,3 +191,25 @@ Sign-in includes a clear Forgot password? action. Password-reset requests always
 
 Magic link is deferred for now. Google sign-in plus password recovery keeps the surface simpler while still providing an easy recovery path.
 
+
+
+## Guided First Run
+For a new OWNER, do not show the full dashboard immediately.
+
+Use real organization data to reveal one next action at a time:
+
+1. No items → “Let’s add your first item”
+2. Item exists but stock is zero → “Now add some stock”
+3. Stock exists but no completed sale → “You’re ready for your first sale”
+4. After the first completed sale → show a brief congratulations and transition to the normal home screen
+
+The onboarding must not rely on a dismissible tutorial flag. It should derive progress from real ledger state so it cannot become stale.
+
+During first run:
+- hide money summaries, reports, staff management, exports, and other secondary navigation from the main screen
+- keep wording short and practical
+- show progress such as “Step 1 of 3”
+- acknowledge completed milestones
+- never block the underlying workflows or data model
+
+After the first sale, the normal home experience becomes the default.
