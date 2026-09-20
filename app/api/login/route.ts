@@ -11,16 +11,22 @@ function clearLoginEmailCookie() {
 function redirectTo(request: Request, path: string, cookies: string[] = []) {
   const headers = new Headers({
     Location: new URL(path, request.url).toString(),
+    "Content-Type": "text/html; charset=utf-8",
+    "Content-Disposition": "inline",
+    "Cache-Control": "no-store",
   });
 
   for (const cookie of cookies) {
     headers.append("Set-Cookie", cookie);
   }
 
-  return new Response(null, {
-    status: 303,
-    headers,
-  });
+  return new Response(
+    '<!doctype html><meta charset="utf-8"><title>Redirecting…</title><p>Redirecting…</p>',
+    {
+      status: 303,
+      headers,
+    }
+  );
 }
 
 function jsonResponse(
@@ -41,10 +47,8 @@ function jsonResponse(
 }
 
 export async function POST(request: Request) {
-  const wantsJson = request.headers
-    .get("accept")
-    ?.toLowerCase()
-    .includes("application/json");
+  const wantsJson =
+    request.headers.get("x-school-ledger-client") === "fetch";
 
   if (!isAuthConfigured()) {
     return wantsJson

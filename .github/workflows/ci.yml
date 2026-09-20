@@ -142,6 +142,7 @@ jobs:
             -o /tmp/store-login-json-body.txt \
             -X POST \
             -H "Accept: application/json" \
+            -H "X-School-Ledger-Client: fetch" \
             -H "Content-Type: application/x-www-form-urlencoded" \
             --data "email=definitely-not-a-user%40example.invalid&password=definitely-wrong" \
             https://store.article6.org/api/login
@@ -156,8 +157,9 @@ jobs:
           fi
 
           curl -sS -D /tmp/store-login-post-headers.txt \
-            -o /dev/null \
+            -o /tmp/store-login-post-body.html \
             -X POST \
+            -H "Accept: text/html,application/xhtml+xml,application/json;q=0.9,*/*;q=0.8" \
             -H "Content-Type: application/x-www-form-urlencoded" \
             --data "email=definitely-not-a-user%40example.invalid&password=definitely-wrong" \
             https://store.article6.org/api/login
@@ -172,5 +174,15 @@ jobs:
 
           if ! grep -Eiq "^location: https://store\.article6\.org/login\?error=credentials" /tmp/store-login-post-headers.txt; then
             echo "Production invalid-login smoke test did not return the expected credentials error."
+            exit 1
+          fi
+
+          if ! grep -Eiq "^content-type: text/html; charset=utf-8" /tmp/store-login-post-headers.txt; then
+            echo "Browser login response was not HTML."
+            exit 1
+          fi
+
+          if ! grep -Eiq "^content-disposition: inline" /tmp/store-login-post-headers.txt; then
+            echo "Browser login response was not explicitly inline."
             exit 1
           fi
