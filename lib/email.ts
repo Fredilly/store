@@ -1,11 +1,10 @@
-import { env, waitUntil } from "cloudflare:workers";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 type EmailEnv = {
   RESEND_API_KEY?: string;
   EMAIL_FROM?: string;
 };
 
-const runtime = env as unknown as EmailEnv;
 const defaultFrom = "School Ledger <no-reply@article6.org>";
 
 type EmailMessage = {
@@ -16,6 +15,9 @@ type EmailMessage = {
 };
 
 async function sendEmail(message: EmailMessage) {
+  const { env } = getCloudflareContext();
+  const runtime = env as unknown as EmailEnv;
+
   if (!runtime.RESEND_API_KEY) return;
 
   const response = await fetch("https://api.resend.com/emails", {
@@ -53,10 +55,14 @@ function escapeHtml(value: string) {
   );
 }
 
+function queueEmail(task: Promise<void>) {
+  getCloudflareContext().ctx.waitUntil(task);
+}
+
 export function queueWelcomeEmail(user: { name: string; email: string }) {
   const name = user.name.trim() || "there";
 
-  waitUntil(
+  queueEmail(
     sendEmail({
       to: user.email,
       subject: "Welcome to School Ledger",
@@ -70,7 +76,7 @@ export function queuePasswordResetEmail(user: { name: string; email: string }, u
   const name = user.name.trim() || "there";
   const safeUrl = escapeHtml(url);
 
-  waitUntil(
+  queueEmail(
     sendEmail({
       to: user.email,
       subject: "Reset your School Ledger password",
