@@ -18,7 +18,7 @@ async function sendEmail(message: EmailMessage) {
   const { env } = getCloudflareContext();
   const runtime = env as unknown as EmailEnv;
 
-  if (!runtime.RESEND_API_KEY) return;
+  if (!runtime.RESEND_API_KEY) return false;
 
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -38,7 +38,10 @@ async function sendEmail(message: EmailMessage) {
   if (!response.ok) {
     const details = await response.text();
     console.error("Transactional email failed", response.status, details);
+    return false;
   }
+
+  return true;
 }
 
 function escapeHtml(value: string) {
@@ -55,7 +58,7 @@ function escapeHtml(value: string) {
   );
 }
 
-function queueEmail(task: Promise<void>) {
+function queueEmail(task: Promise<unknown>) {
   getCloudflareContext().ctx.waitUntil(task);
 }
 
@@ -84,4 +87,34 @@ export function queuePasswordResetEmail(user: { name: string; email: string }, u
       html: `<p>Hi ${escapeHtml(name)},</p><p>Use the link below to reset your School Ledger password.</p><p><a href="${safeUrl}">Reset password</a></p><p>If you did not request this, you can ignore this email.</p>`,
     })
   );
+}
+
+
+export async function sendStaffInviteEmail({
+  name,
+  email,
+  organizationName,
+}: {
+  name: string;
+  email: string;
+  organizationName: string;
+}) {
+  const recipientName = name.trim() || "there";
+  const safeName = escapeHtml(recipientName);
+  const safeOrganization = escapeHtml(organizationName);
+  const loginUrl = "https://store.article6.org/login";
+
+  return sendEmail({
+    to: email,
+    subject: `You've been invited to ${organizationName} on School Ledger`,
+    text: `Hi ${recipientName},
+
+You've been invited to join ${organizationName} as staff on School Ledger.
+
+Use this exact email address to create your account or sign in:
+${loginUrl}
+
+As staff, you can sell items, add stock, and view inventory.`,
+    html: `<p>Hi ${safeName},</p><p>You've been invited to join <strong>${safeOrganization}</strong> as staff on <strong>School Ledger</strong>.</p><p>Use this exact email address to create your account or sign in.</p><p><a href="${loginUrl}">Open School Ledger</a></p><p>As staff, you can sell items, add stock, and view inventory.</p>`,
+  });
 }
