@@ -651,3 +651,46 @@ button {
   font-weight: 800;
   text-align: center;
 }
+
+
+.firstSaleHint {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border: 1px solid #dde1e6;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.firstSaleHint div {
+  min-width: 0;
+}
+
+.firstSaleHint strong,
+.firstSaleHint span {
+  display: block;
+}
+
+.firstSaleHint span {
+  margin-top: 3px;
+  color: #686d75;
+  font-size: 0.88rem;
+  line-height: 1.35;
+}
+
+.firstSaleHint a {
+  flex: 0 0 auto;
+  color: #2556d8;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+@media (max-width: 520px) {
+  .firstSaleHint {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
