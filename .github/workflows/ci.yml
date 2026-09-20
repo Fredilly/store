@@ -37,6 +37,34 @@ jobs:
       - name: Apply D1 migrations to clean local database
         run: npm run db:migrate:local
 
+      - name: Verify immutable-history database guards
+        run: |
+          npx wrangler d1 execute store-db --local --json --command "
+            SELECT name
+            FROM sqlite_master
+            WHERE type = 'trigger'
+              AND name IN (
+                'prevent_audit_events_update',
+                'prevent_audit_events_delete',
+                'prevent_sales_delete',
+                'prevent_sale_items_delete',
+                'prevent_payments_delete',
+                'prevent_stock_movements_delete',
+                'require_audit_actor'
+              )
+            ORDER BY name;
+          " > /tmp/audit-triggers.json
+
+          cat /tmp/audit-triggers.json
+
+          for trigger in             prevent_audit_events_update             prevent_audit_events_delete             prevent_sales_delete             prevent_sale_items_delete             prevent_payments_delete             prevent_stock_movements_delete             require_audit_actor
+          do
+            if ! grep -q "$trigger" /tmp/audit-triggers.json; then
+              echo "Missing immutable-history trigger: $trigger"
+              exit 1
+            fi
+          done
+
 
   deploy:
     name: Deploy to Cloudflare
