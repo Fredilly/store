@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { authClient } from "../../lib/auth-client";
+import { BrandMark, WelcomeArtwork } from "../../components/BrandMark";
 
 async function hasAuthenticatedSession() {
   const response = await fetch("/api/auth/get-session", {
@@ -113,14 +114,23 @@ export function LoginForm({
   }
 
   return (
-    <main className="authShell">
+    <main className={mode === "signup" ? "authShell authShellWelcome" : "authShell"}>
+      {mode === "signup" && (
+        <section className="welcomeIntro" aria-label="Welcome to School Ledger">
+          <BrandMark />
+          <h1>Know what you have.<br />Record what you sell.</h1>
+          <p>A simple way to track school stock, sales, and money owed — right from your phone.</p>
+          <WelcomeArtwork />
+        </section>
+      )}
+
       <section className="authCard">
-        <p className="eyebrow">School Ledger</p>
-        <h1>{mode === "signin" ? "Welcome back" : "Create account"}</h1>
+        {mode === "signin" ? <BrandMark compact /> : <p className="eyebrow">Let’s get started</p>}
+        <h1>{mode === "signin" ? "Welcome back" : "Create your account"}</h1>
         <p className="muted">
           {mode === "signin"
-            ? "Sign in to your school."
-            : "Use the email your school owner invited, or create a new school."}
+            ? "Sign in to continue."
+            : "Start with your first item. We’ll guide you step by step."}
         </p>
 
         <form action="/api/login" className="form authForm" method="post" onSubmit={submit}>
