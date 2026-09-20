@@ -13,11 +13,19 @@ export async function POST(request: Request) {
   const form = await request.formData();
   const name = String(form.get("name") ?? "").trim();
   const variantName = String(form.get("variant_name") ?? "").trim();
-  const category = String(form.get("category") ?? "").trim();
   const barcode = String(form.get("barcode") ?? "").trim();
   const sellingPriceMinor = toMinor(form.get("selling_price"));
+  const costPriceMinor = form.get("cost_price") ? toMinor(form.get("cost_price")) : null;
+  const startingStock = Number.parseInt(String(form.get("starting_stock") ?? "0"), 10);
 
-  if (!name || sellingPriceMinor <= 0 || barcode.length > 256) {
+  if (
+    !name ||
+    sellingPriceMinor <= 0 ||
+    barcode.length > 256 ||
+    !Number.isInteger(startingStock) ||
+    startingStock < 0 ||
+    (costPriceMinor !== null && costPriceMinor < 0)
+  ) {
     return Response.redirect(new URL("/stock?error=product", request.url), 303);
   }
 
@@ -40,11 +48,18 @@ export async function POST(request: Request) {
 
   const statements = [
     database.prepare(
-      "INSERT INTO products (id, organization_id, name, category) VALUES (?, ?, ?, ?)"
-    ).bind(productId, tenant.orgId, name, category || null),
+      "INSERT INTO products (id, organization_id, name) VALUES (?, ?, ?)"
+    ).bind(productId, tenant.orgId, name),
     database.prepare(
-      "INSERT INTO product_variants (id, organization_id, product_id, variant_name, selling_price_minor) VALUES (?, ?, ?, ?, ?)"
-    ).bind(variantId, tenant.orgId, productId, variantName || null, sellingPriceMinor),
+      "INSERT INTO product_variants (id, organization_id, product_id, variant_name, cost_price_minor, selling_price_minor) VALUES (?, ?, ?, ?, ?, ?)"
+    ).bind(
+      variantId,
+      tenant.orgId,
+      productId,
+      variantName || null,
+      costPriceMinor,
+      sellingPriceMinor
+    ),
   ];
 
   if (barcode) {
@@ -52,6 +67,37 @@ export async function POST(request: Request) {
       database.prepare(
         "INSERT INTO scan_codes (id, organization_id, product_variant_id, code, code_type) VALUES (?, ?, ?, ?, 'BARCODE')"
       ).bind(crypto.randomUUID(), tenant.orgId, variantId, barcode)
+    );
+  }
+
+  if (startingStock > 0) {
+    const movementId = crypto.randomUUID();
+
+    statements.push(
+      database.prepare(
+        "INSERT INTO stock_movements (id, organization_id, product_variant_id, movement_type, quantity_delta, unit_cost_minor, created_by_user_id) VALUES (?, ?, ?, 'RECEIVE', ?, ?, ?)"
+      ).bind(
+        movementId,
+        tenant.orgId,
+        variantId,
+        startingStock,
+        costPriceMinor,
+        tenant.userId
+      ),
+      database.prepare(
+        "INSERT INTO audit_events (id, organization_id, actor_user_id, event_type, entity_type, entity_id, metadata_json) VALUES (?, ?, ?, 'STOCK_RECEIVED', 'stock_movement', ?, ?)"
+      ).bind(
+        crypto.randomUUID(),
+        tenant.orgId,
+        tenant.userId,
+        movementId,
+        JSON.stringify({
+          variantId,
+          quantity: startingStock,
+          unitCostMinor: costPriceMinor,
+          source: "PRODUCT_SETUP",
+        })
+      )
     );
   }
 
@@ -63,7 +109,14 @@ export async function POST(request: Request) {
       tenant.orgId,
       tenant.userId,
       variantId,
-      JSON.stringify({ name, variantName, sellingPriceMinor, hasBarcode: Boolean(barcode) })
+      JSON.stringify({
+        name,
+        variantName,
+        sellingPriceMinor,
+        costPriceMinor,
+        startingStock,
+        hasBarcode: Boolean(barcode),
+      })
     )
   );
 

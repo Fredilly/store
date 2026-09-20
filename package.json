@@ -14,7 +14,8 @@
     "typecheck": "tsc --noEmit",
     "test:core": "bash scripts/core-regression.sh",
     "test:authz": "bash scripts/authz-regression.sh",
-    "test:acceptance": "npm run test:authz && npm run test:core"
+    "test:acceptance": "npm run test:authz && npm run test:core && npm run test:product-setup",
+    "test:product-setup": "bash scripts/product-setup-regression.sh"
   },
   "dependencies": {
     "@opennextjs/cloudflare": "1.20.6",
