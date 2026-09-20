@@ -26,8 +26,9 @@ export default async function SellPage() {
             <Link className="inlineAction" href="/stock">Add stock →</Link>
           </>
         ) : (
-          <BarcodeScanner targetSelectId="sell-variant" />
-          <form action="/api/sales" method="post" className="form">
+          <>
+            <BarcodeScanner targetSelectId="sell-variant" />
+            <form action="/api/sales" method="post" className="form">
             <input type="hidden" name="submission_key" value={submissionKey} />
             <label>
               Item
@@ -51,8 +52,9 @@ export default async function SellPage() {
               Amount paid
               <input name="amount_paid" inputMode="decimal" min="0" step="0.01" type="number" placeholder="Leave blank if fully paid" />
             </label>
-            <button type="submit">Record sale</button>
-          </form>
+              <button type="submit">Record sale</button>
+            </form>
+          </>
         )}
       </section>
     </main>
