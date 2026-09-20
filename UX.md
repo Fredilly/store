@@ -200,16 +200,17 @@ Use real organization data to reveal one next action at a time:
 
 1. No items → “Let’s add your first item”
 2. Item exists but stock is zero → “Now add some stock”
-3. Stock exists but no completed sale → “You’re ready for your first sale”
-4. After the first completed sale → show a brief congratulations and transition to the normal home screen
+3. Once stock exists → unlock the normal home screen immediately
+4. Until the first sale happens, show a small optional “Record a sale when you’re ready” helper without blocking anything
+5. After the first completed sale → show a brief congratulations
 
 The onboarding must not rely on a dismissible tutorial flag. It should derive progress from real ledger state so it cannot become stale.
 
 During first run:
 - hide money summaries, reports, staff management, exports, and other secondary navigation from the main screen
 - keep wording short and practical
-- show progress such as “Step 1 of 3”
-- acknowledge completed milestones
+- show progress such as “Step 1 of 2”
+- acknowledge completed milestones with tiny, lightweight celebrations
 - never block the underlying workflows or data model
 
-After the first sale, the normal home experience becomes the default.
+The first sale is never required to finish setup. The normal home experience begins as soon as an item has stock.
