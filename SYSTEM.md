@@ -189,6 +189,26 @@ Do not make QR codes the primary identifier in the database. They are lookup ali
 - Index organization ID and common lookup fields from the beginning.
 - Backups/export must exist before the system holds important real records.
 
+## PR Acceptance Gate
+Every feature or fix PR must include a feature-specific acceptance pass before merge.
+
+A PR is not considered done merely because it typechecks, builds, or deploys.
+
+For each PR:
+- identify the user-visible or system invariant being added or changed
+- exercise the happy path
+- exercise the most important failure and duplicate/retry paths
+- verify permissions and tenant isolation where relevant
+- verify the resulting database state, not only the UI response
+- add automated regression coverage when practical
+- do not merge until the feature-specific acceptance pass is green
+
+For integrity-sensitive work, test the invariant destructively when safe. For example, if history is meant to be immutable, CI should attempt to alter or delete it and prove the database rejects the operation.
+
+The database must defend critical truth even if application code is wrong. Important protections should live at the database layer where practical, using constraints, foreign keys, append-only ledgers, triggers, idempotency, and explicit migrations.
+
+Application tests protect behavior. Database invariants protect records. Backup and recovery protect against migration mistakes, operator error, and catastrophic failure. All three layers are required before the system is trusted as the sole source of important records.
+
 ## V1 Scope
 Build only:
 
