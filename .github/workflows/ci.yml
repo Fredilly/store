@@ -37,30 +37,111 @@ jobs:
       - name: Apply D1 migrations to clean local database
         run: npm run db:migrate:local
 
-      - name: Verify immutable-history database guards
+      - name: Verify immutable-history acceptance
         run: |
+          set -e
+
+          npx wrangler d1 execute store-db --local --command "
+            INSERT INTO organizations (id, name, currency)
+            VALUES ('accept_org', 'Acceptance School', 'NGN');
+
+            INSERT INTO \"user\" (id, name, email, emailVerified, createdAt, updatedAt)
+            VALUES ('accept_user', 'Acceptance Owner', 'accept@example.com', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+            INSERT INTO organization_members (organization_id, user_id, role, status)
+            VALUES ('accept_org', 'accept_user', 'OWNER', 'ACTIVE');
+
+            INSERT INTO products (id, organization_id, name)
+            VALUES ('accept_product', 'accept_org', 'Test Item');
+
+            INSERT INTO product_variants (
+              id, organization_id, product_id, variant_name, selling_price_minor
+            )
+            VALUES (
+              'accept_variant', 'accept_org', 'accept_product', 'Default', 1000
+            );
+
+            INSERT INTO sales (
+              id, organization_id, total_minor, created_by_user_id
+            )
+            VALUES ('accept_sale', 'accept_org', 1000, 'accept_user');
+
+            INSERT INTO sale_items (
+              id, organization_id, sale_id, product_variant_id,
+              quantity, unit_price_minor, line_total_minor
+            )
+            VALUES (
+              'accept_sale_item', 'accept_org', 'accept_sale', 'accept_variant',
+              1, 1000, 1000
+            );
+
+            INSERT INTO payments (
+              id, organization_id, sale_id, amount_minor, received_by_user_id
+            )
+            VALUES (
+              'accept_payment', 'accept_org', 'accept_sale', 1000, 'accept_user'
+            );
+
+            INSERT INTO stock_movements (
+              id, organization_id, product_variant_id, movement_type,
+              quantity_delta, related_sale_id, created_by_user_id
+            )
+            VALUES (
+              'accept_movement', 'accept_org', 'accept_variant', 'SALE',
+              -1, 'accept_sale', 'accept_user'
+            );
+
+            INSERT INTO audit_events (
+              id, organization_id, actor_user_id, event_type,
+              entity_type, entity_id, metadata_json
+            )
+            VALUES (
+              'accept_audit', 'accept_org', 'accept_user',
+              'SALE_CREATED', 'sale', 'accept_sale', '{}'
+            );
+          "
+
+          expect_blocked() {
+            label="$1"
+            sql="$2"
+
+            set +e
+            output=$(npx wrangler d1 execute store-db --local --command "$sql" 2>&1)
+            status=$?
+            set -e
+
+            echo "=== $label ==="
+            echo "$output"
+
+            if [ "$status" -eq 0 ]; then
+              echo "FAIL: $label was allowed."
+              exit 1
+            fi
+          }
+
+          expect_blocked "audit update" "UPDATE audit_events SET event_type='TAMPERED' WHERE id='accept_audit';"
+          expect_blocked "audit delete" "DELETE FROM audit_events WHERE id='accept_audit';"
+          expect_blocked "sale delete" "DELETE FROM sales WHERE id='accept_sale';"
+          expect_blocked "sale item delete" "DELETE FROM sale_items WHERE id='accept_sale_item';"
+          expect_blocked "payment delete" "DELETE FROM payments WHERE id='accept_payment';"
+          expect_blocked "stock movement delete" "DELETE FROM stock_movements WHERE id='accept_movement';"
+          expect_blocked "audit without actor" "INSERT INTO audit_events (id, organization_id, actor_user_id, event_type, entity_type, entity_id) VALUES ('accept_no_actor', 'accept_org', NULL, 'TEST', 'test', 'accept_test');"
+
           npx wrangler d1 execute store-db --local --json --command "
-            SELECT name
-            FROM sqlite_master
-            WHERE type = 'trigger'
-              AND name IN (
-                'prevent_audit_events_update',
-                'prevent_audit_events_delete',
-                'prevent_sales_delete',
-                'prevent_sale_items_delete',
-                'prevent_payments_delete',
-                'prevent_stock_movements_delete',
-                'require_audit_actor'
-              )
-            ORDER BY name;
-          " > /tmp/audit-triggers.json
+            SELECT
+              (SELECT COUNT(*) FROM audit_events WHERE id='accept_audit') AS audit_preserved,
+              (SELECT COUNT(*) FROM sales WHERE id='accept_sale') AS sale_preserved,
+              (SELECT COUNT(*) FROM sale_items WHERE id='accept_sale_item') AS sale_item_preserved,
+              (SELECT COUNT(*) FROM payments WHERE id='accept_payment') AS payment_preserved,
+              (SELECT COUNT(*) FROM stock_movements WHERE id='accept_movement') AS movement_preserved;
+          " > /tmp/immutable-acceptance.json
 
-          cat /tmp/audit-triggers.json
+          cat /tmp/immutable-acceptance.json
 
-          for trigger in             prevent_audit_events_update             prevent_audit_events_delete             prevent_sales_delete             prevent_sale_items_delete             prevent_payments_delete             prevent_stock_movements_delete             require_audit_actor
+          for field in audit_preserved sale_preserved sale_item_preserved payment_preserved movement_preserved
           do
-            if ! grep -q "$trigger" /tmp/audit-triggers.json; then
-              echo "Missing immutable-history trigger: $trigger"
+            if ! grep -Eq "\"$field\"[[:space:]]*:[[:space:]]*1" /tmp/immutable-acceptance.json; then
+              echo "FAIL: immutable record was not preserved: $field"
               exit 1
             fi
           done
