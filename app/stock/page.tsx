@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Icon } from "../../components/Icon";
 import { listVariants } from "../../lib/queries";
 import { requirePageTenant } from "../../lib/tenant";
 import { BarcodeScanner } from "../../components/BarcodeScanner";
@@ -10,7 +11,7 @@ export default async function StockPage() {
   return (
     <main className="shell">
       <div className="pageTop">
-        <Link className="back" href="/">← Home</Link>
+        <Link className="back" href="/"><Icon name="home" size={19} className="backIcon" /><span>Home</span></Link>
         <p className="eyebrow">Add Stock</p>
         <h1>Stock received</h1>
         <p className="muted">Choose an item, enter the quantity, save.</p>

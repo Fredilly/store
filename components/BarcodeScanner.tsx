@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { Icon } from "./Icon";
 
 type BarcodeScannerProps = {
   targetSelectId?: string;
@@ -190,7 +191,8 @@ export function BarcodeScanner({
     <div className="scanner">
       <div className="scannerActions">
         <button type="button" className="scanButton" onClick={scan} disabled={scanning}>
-          {scanning ? "Scanning…" : "Scan barcode"}
+          <Icon name="camera" size={22} className="buttonIcon" />
+          <span>{scanning ? "Scanning…" : "Scan barcode"}</span>
         </button>
         {scanning && (
           <button type="button" className="buttonSecondary" onClick={stopScanner}>

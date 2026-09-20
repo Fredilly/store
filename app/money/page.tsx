@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Icon } from "../../components/Icon";
 import { listOutstandingSales, moneySummary } from "../../lib/queries";
 import { formatNaira } from "../../lib/money";
 import { requirePageOwner } from "../../lib/tenant";
@@ -13,7 +14,7 @@ export default async function MoneyPage() {
   return (
     <main className="shell">
       <div className="pageTop">
-        <Link className="back" href="/">← Home</Link>
+        <Link className="back" href="/"><Icon name="home" size={19} className="backIcon" /><span>Home</span></Link>
         <p className="eyebrow">Money</p>
         <h1>Money summary</h1>
       </div>
