@@ -3,6 +3,41 @@
 import { FormEvent, useState } from "react";
 import { authClient } from "../../lib/auth-client";
 
+function authErrorMessage(message?: string) {
+  const normalized = message?.toLowerCase() ?? "";
+
+  if (
+    normalized.includes("invalid") ||
+    normalized.includes("incorrect") ||
+    normalized.includes("password") ||
+    normalized.includes("credential")
+  ) {
+    return "Incorrect email or password.";
+  }
+
+  return message || "Could not sign in. Please try again.";
+}
+
+async function hasAuthenticatedSession() {
+  const response = await fetch("/api/auth/get-session", {
+    method: "GET",
+    credentials: "include",
+    cache: "no-store",
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  if (!response.ok) return false;
+
+  const data = (await response.json()) as {
+    session?: unknown;
+    user?: unknown;
+  } | null;
+
+  return Boolean(data?.session && data?.user);
+}
+
 export function LoginForm() {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [name, setName] = useState("");
@@ -23,19 +58,38 @@ export function LoginForm() {
 
     setBusy(true);
 
-    const result =
-      mode === "signup"
-        ? await authClient.signUp.email({ name, email, password })
-        : await authClient.signIn.email({ email, password });
+    try {
+      const result =
+        mode === "signup"
+          ? await authClient.signUp.email({ name, email, password })
+          : await authClient.signIn.email({ email, password });
 
-    setBusy(false);
+      if (result.error) {
+        setMessage(
+          mode === "signin"
+            ? authErrorMessage(result.error.message)
+            : result.error.message || "Could not create account."
+        );
+        return;
+      }
 
-    if (result.error) {
-      setMessage(result.error.message || "Could not continue.");
-      return;
+      const authenticated = await hasAuthenticatedSession();
+
+      if (!authenticated) {
+        setMessage(
+          mode === "signin"
+            ? "Incorrect email or password."
+            : "Account created, but sign in did not complete. Please sign in."
+        );
+        return;
+      }
+
+      window.location.assign("/");
+    } catch {
+      setMessage("Could not connect. Check your connection and try again.");
+    } finally {
+      setBusy(false);
     }
-
-    window.location.href = "/";
   }
 
   return (
@@ -100,7 +154,11 @@ export function LoginForm() {
             </label>
           )}
 
-          {message && <p className="formError">{message}</p>}
+          {message && (
+            <p className="formError" role="alert" aria-live="polite">
+              {message}
+            </p>
+          )}
 
           <button disabled={busy} type="submit">
             {busy
