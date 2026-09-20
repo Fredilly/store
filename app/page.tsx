@@ -25,7 +25,11 @@ export default async function Home({
   const success = params.success ? successMessages[params.success] : undefined;
   const actions =
     tenant.role === "OWNER"
-      ? [...baseActions, { label: "Money", href: "/money", detail: "Sold, received, still owed" }]
+      ? [
+          ...baseActions,
+          { label: "Money", href: "/money", detail: "Sold, received, still owed" },
+          { label: "Activity", href: "/activity", detail: "See who changed what" },
+        ]
       : baseActions;
 
   return (
