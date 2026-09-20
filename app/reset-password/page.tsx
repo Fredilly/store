@@ -1,10 +1,10 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { authClient } from "../../lib/auth-client";
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const invalidToken = searchParams.get("error") === "INVALID_TOKEN";
@@ -90,5 +90,14 @@ export default function ResetPasswordPage() {
         )}
       </section>
     </main>
+  );
+}
+
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={null}>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }

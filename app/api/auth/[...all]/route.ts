@@ -1,4 +1,4 @@
-import { auth, isAuthConfigured } from "../../../../lib/auth";
+import { getAuth, isAuthConfigured } from "../../../../lib/auth";
 
 function unavailable() {
   return Response.json(
@@ -9,10 +9,10 @@ function unavailable() {
 
 export async function GET(request: Request) {
   if (!isAuthConfigured()) return unavailable();
-  return auth.handler(request);
+  return getAuth().handler(request);
 }
 
 export async function POST(request: Request) {
   if (!isAuthConfigured()) return unavailable();
-  return auth.handler(request);
+  return getAuth().handler(request);
 }

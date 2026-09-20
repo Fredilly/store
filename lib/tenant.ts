@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "./auth";
+import { getAuth } from "./auth";
 import { db } from "./db";
 
 export type Tenant = {
@@ -30,7 +30,7 @@ async function findMembership(userId: string) {
 }
 
 export async function getTenant(requestHeaders: Headers): Promise<Tenant | null> {
-  const session = await auth.api.getSession({ headers: requestHeaders });
+  const session = await getAuth().api.getSession({ headers: requestHeaders });
   if (!session) return null;
 
   let membership = await findMembership(session.user.id);
@@ -112,7 +112,7 @@ export async function requireOwner(requestHeaders: Headers): Promise<Tenant> {
 
 export async function requirePageTenant(): Promise<Tenant> {
   const requestHeaders = await headers();
-  const session = await auth.api.getSession({ headers: requestHeaders });
+  const session = await getAuth().api.getSession({ headers: requestHeaders });
 
   if (!session) redirect("/login");
 

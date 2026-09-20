@@ -1,9 +1,10 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "store",
-  "main": "vinext/server/app-router-entry",
+  "main": ".open-next/worker.js",
   "compatibility_date": "2026-09-19",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "keep_vars": true,
   "routes": [
     {
       "pattern": "store.article6.org",
@@ -11,7 +12,8 @@
     }
   ],
   "assets": {
-    "not_found_handling": "none"
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
   },
   "d1_databases": [
     {

@@ -1,5 +1,5 @@
 import { betterAuth } from "better-auth";
-import { env } from "cloudflare:workers";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { queuePasswordResetEmail, queueWelcomeEmail } from "./email";
 
 type AuthEnv = {
@@ -10,67 +10,81 @@ type AuthEnv = {
   GOOGLE_CLIENT_SECRET?: string;
 };
 
-const runtime = env as unknown as AuthEnv;
+function runtimeEnv(): AuthEnv {
+  return getCloudflareContext().env as unknown as AuthEnv;
+}
 
-const googleConfigured = Boolean(
-  runtime.GOOGLE_CLIENT_ID && runtime.GOOGLE_CLIENT_SECRET
-);
+function createAuth() {
+  const runtime = runtimeEnv();
+  const googleConfigured = Boolean(
+    runtime.GOOGLE_CLIENT_ID && runtime.GOOGLE_CLIENT_SECRET
+  );
 
-const trustedOrigins = Array.from(
-  new Set(
-    [
-      runtime.BETTER_AUTH_URL,
-      "https://store.article6.org",
-      "https://store.fredilly.workers.dev",
-      "http://localhost:3000",
-    ].filter((value): value is string => Boolean(value))
-  )
-);
+  const trustedOrigins = Array.from(
+    new Set(
+      [
+        runtime.BETTER_AUTH_URL,
+        "https://store.article6.org",
+        "https://store.fredilly.workers.dev",
+        "http://localhost:3000",
+      ].filter((value): value is string => Boolean(value))
+    )
+  );
 
-export const auth = betterAuth({
-  database: runtime.DB,
-  baseURL: runtime.BETTER_AUTH_URL,
-  trustedOrigins,
-  secret:
-    runtime.BETTER_AUTH_SECRET ??
-    "development-only-secret-change-before-real-use-123456",
-  emailAndPassword: {
-    enabled: true,
-    revokeSessionsOnPasswordReset: true,
-    sendResetPassword: async ({ user, url }) => {
-      queuePasswordResetEmail(user, url);
+  return betterAuth({
+    database: runtime.DB,
+    baseURL: runtime.BETTER_AUTH_URL,
+    trustedOrigins,
+    secret:
+      runtime.BETTER_AUTH_SECRET ??
+      "development-only-secret-change-before-real-use-123456",
+    emailAndPassword: {
+      enabled: true,
+      revokeSessionsOnPasswordReset: true,
+      sendResetPassword: async ({ user, url }) => {
+        queuePasswordResetEmail(user, url);
+      },
     },
-  },
-  socialProviders: googleConfigured
-    ? {
-        google: {
-          clientId: runtime.GOOGLE_CLIENT_ID!,
-          clientSecret: runtime.GOOGLE_CLIENT_SECRET!,
-        },
-      }
-    : {},
-  databaseHooks: {
-    user: {
-      create: {
-        after: async (user) => {
-          queueWelcomeEmail(user);
+    socialProviders: googleConfigured
+      ? {
+          google: {
+            clientId: runtime.GOOGLE_CLIENT_ID!,
+            clientSecret: runtime.GOOGLE_CLIENT_SECRET!,
+          },
+        }
+      : {},
+    databaseHooks: {
+      user: {
+        create: {
+          after: async (user) => {
+            queueWelcomeEmail(user);
+          },
         },
       },
     },
-  },
-  advanced: {
-    database: {
-      generateId: "uuid",
+    advanced: {
+      database: {
+        generateId: "uuid",
+      },
     },
-  },
-});
+  });
+}
+
+type AuthInstance = ReturnType<typeof createAuth>;
+let authInstance: AuthInstance | undefined;
+
+export function getAuth(): AuthInstance {
+  authInstance ??= createAuth();
+  return authInstance;
+}
 
 export function isAuthConfigured() {
-  return Boolean(runtime.BETTER_AUTH_SECRET);
+  return Boolean(runtimeEnv().BETTER_AUTH_SECRET);
 }
 
 export function authCapabilities() {
+  const runtime = runtimeEnv();
   return {
-    google: googleConfigured,
+    google: Boolean(runtime.GOOGLE_CLIENT_ID && runtime.GOOGLE_CLIENT_SECRET),
   };
 }
