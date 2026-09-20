@@ -894,3 +894,36 @@ button,
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/* Minimal icon system */
+.actionIcon {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 12px;
+  color: #4f5865;
+  flex: 0 0 auto;
+}
+
+.back {
+  gap: 8px;
+}
+
+.backIcon,
+.buttonIcon {
+  flex: 0 0 auto;
+}
+
+.scanButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+}
+
+@media (max-width: 520px) {
+  .actionIcon {
+    width: 26px;
+    height: 26px;
+  }
+}
