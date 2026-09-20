@@ -2,6 +2,7 @@ import Link from "next/link";
 import { listVariants } from "../../lib/queries";
 import { formatNaira } from "../../lib/money";
 import { requirePageTenant } from "../../lib/tenant";
+import { BarcodeScanner } from "../../components/BarcodeScanner";
 
 export default async function SellPage() {
   const tenant = await requirePageTenant();
@@ -25,11 +26,12 @@ export default async function SellPage() {
             <Link className="inlineAction" href="/stock">Add stock →</Link>
           </>
         ) : (
+          <BarcodeScanner targetSelectId="sell-variant" />
           <form action="/api/sales" method="post" className="form">
             <input type="hidden" name="submission_key" value={submissionKey} />
             <label>
               Item
-              <select name="variant_id" required>
+              <select id="sell-variant" name="variant_id" required>
                 {variants.map((item) => (
                   <option key={item.id} value={item.id}>
                     {item.label} · {formatNaira(item.selling_price_minor)} · {item.stock} left
