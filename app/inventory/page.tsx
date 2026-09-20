@@ -11,8 +11,8 @@ export default async function InventoryPage() {
     <main className="shell">
       <div className="pageTop">
         <Link className="back" href="/">← Home</Link>
-        <p className="eyebrow">Inventory</p>
-        <h1>What is left</h1>
+        <p className="eyebrow">Stock</p>
+        <h1>What you have</h1>
       </div>
 
       <section className="list">
