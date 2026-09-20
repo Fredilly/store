@@ -40,6 +40,9 @@ jobs:
       - name: Core acceptance regression suite
         run: npm run test:acceptance
 
+      - name: Export and recovery acceptance
+        run: bash scripts/export-regression.sh
+
       - name: Verify immutable-history database guards
         run: |
           npx wrangler d1 execute store-db --local --json --command "
