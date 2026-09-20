@@ -148,8 +148,10 @@ export default async function Home({
           <section className="actions" aria-label="Main actions">
             {actions.map((action) => (
               <a className="action" href={action.href} key={action.href}>
-                <Icon name={action.icon} size={24} className="actionIcon" />
-                <strong>{action.label}</strong>
+                <div className="actionTitle">
+                  <Icon name={action.icon} size={30} className="actionIcon" />
+                  <strong>{action.label}</strong>
+                </div>
                 <span>{action.detail}</span>
               </a>
             ))}

@@ -191,7 +191,7 @@ export function BarcodeScanner({
     <div className="scanner">
       <div className="scannerActions">
         <button type="button" className="scanButton" onClick={scan} disabled={scanning}>
-          <Icon name="camera" size={22} className="buttonIcon" />
+          <Icon name="camera" size={29} className="buttonIcon" />
           <span>{scanning ? "Scanning…" : "Scan barcode"}</span>
         </button>
         {scanning && (

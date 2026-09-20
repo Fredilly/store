@@ -927,3 +927,58 @@ button,
     height: 26px;
   }
 }
+
+
+/* Icon visibility refinement */
+.actionTitle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.actionTitle .actionIcon {
+  width: 30px;
+  height: 30px;
+  margin: 0;
+  color: #15171a;
+  stroke-width: 2;
+}
+
+.actionTitle strong {
+  line-height: 1.2;
+}
+
+.actionTitle + span {
+  margin-top: 8px;
+}
+
+.scanButton {
+  min-height: 64px;
+  font-size: 1.18rem;
+  font-weight: 850;
+  color: #123b9d;
+  gap: 12px;
+}
+
+.scanButton .buttonIcon {
+  width: 29px;
+  height: 29px;
+  stroke-width: 2;
+}
+
+@media (max-width: 520px) {
+  .actionTitle .actionIcon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .scanButton {
+    min-height: 66px;
+    font-size: 1.2rem;
+  }
+
+  .scanButton .buttonIcon {
+    width: 31px;
+    height: 31px;
+  }
+}
