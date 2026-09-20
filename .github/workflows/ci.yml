@@ -186,3 +186,38 @@ jobs:
             echo "Browser login response was not explicitly inline."
             exit 1
           fi
+
+          cat > /tmp/browser-login-agents.txt <<'EOF'
+iOS Safari|Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1
+iOS Chromium|Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 CriOS/140.0.0 Mobile/15E148 Safari/604.1
+Android Chrome|Mozilla/5.0 (Linux; Android 15; Pixel 9) AppleWebKit/537.36 Chrome/140.0.0.0 Mobile Safari/537.36
+Android Firefox|Mozilla/5.0 (Android 15; Mobile; rv:142.0) Gecko/142.0 Firefox/142.0
+Samsung Internet|Mozilla/5.0 (Linux; Android 15; SAMSUNG SM-S938B) AppleWebKit/537.36 SamsungBrowser/28.0 Chrome/130.0.0.0 Mobile Safari/537.36
+Desktop Chrome|Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/140.0.0.0 Safari/537.36
+EOF
+
+          while IFS='|' read -r BROWSER_NAME USER_AGENT; do
+            echo "=== LOGIN CONTRACT: $BROWSER_NAME ==="
+
+            curl -sS -D /tmp/browser-contract-headers.txt               -o /tmp/browser-contract-body.html               -X POST               -A "$USER_AGENT"               -H "Accept: text/html,application/xhtml+xml,application/json;q=0.9,*/*;q=0.8"               -H "Content-Type: application/x-www-form-urlencoded"               --data "email=definitely-not-a-user%40example.invalid&password=definitely-wrong"               https://store.article6.org/api/login
+
+            if ! grep -Eq "^HTTP/[0-9.]+ 303" /tmp/browser-contract-headers.txt; then
+              echo "$BROWSER_NAME did not receive a 303 browser redirect."
+              exit 1
+            fi
+
+            if ! grep -Eiq "^content-type: text/html; charset=utf-8" /tmp/browser-contract-headers.txt; then
+              echo "$BROWSER_NAME did not receive HTML."
+              exit 1
+            fi
+
+            if ! grep -Eiq "^content-disposition: inline" /tmp/browser-contract-headers.txt; then
+              echo "$BROWSER_NAME received a downloadable response."
+              exit 1
+            fi
+
+            if grep -Eiq "^content-type: application/json" /tmp/browser-contract-headers.txt; then
+              echo "$BROWSER_NAME was incorrectly treated as an API client."
+              exit 1
+            fi
+          done < /tmp/browser-login-agents.txt
