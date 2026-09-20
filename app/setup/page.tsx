@@ -1,11 +1,11 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "../../lib/auth";
+import { getAuth } from "../../lib/auth";
 import { getTenant } from "../../lib/tenant";
 
 export default async function SetupPage() {
   const requestHeaders = await headers();
-  const session = await auth.api.getSession({ headers: requestHeaders });
+  const session = await getAuth().api.getSession({ headers: requestHeaders });
 
   if (!session) redirect("/login");
 
