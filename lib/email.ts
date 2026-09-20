@@ -64,13 +64,25 @@ function queueEmail(task: Promise<unknown>) {
 
 export function queueWelcomeEmail(user: { name: string; email: string }) {
   const name = user.name.trim() || "there";
+  const appUrl = "https://store.article6.org/";
 
   queueEmail(
     sendEmail({
       to: user.email,
-      subject: "Welcome to School Ledger",
-      text: `Hi ${name},\n\nWelcome to School Ledger. Your account is ready.\n\nIf you did not create this account, you can ignore this email.`,
-      html: `<p>Hi ${escapeHtml(name)},</p><p>Welcome to <strong>School Ledger</strong>. Your account is ready.</p><p>If you did not create this account, you can ignore this email.</p>`,
+      subject: "Welcome to School Ledger — your account is ready",
+      text: `Hi ${name},
+
+Welcome to School Ledger.
+
+You can now keep track of what you have, record what you sell, and see what money has been received or is still owed.
+
+Start by adding your first item:
+${appUrl}
+
+We’ll guide you step by step.
+
+If you did not create this account, you can ignore this email.`,
+      html: `<p>Hi ${escapeHtml(name)},</p><p>Welcome to <strong>School Ledger</strong>.</p><p>You can now keep track of what you have, record what you sell, and see what money has been received or is still owed.</p><p><a href="${appUrl}" style="display:inline-block;padding:12px 18px;border-radius:10px;background:#15171a;color:#ffffff;text-decoration:none;font-weight:700;">Add your first item</a></p><p>We’ll guide you step by step.</p><p style="color:#686d75;">If you did not create this account, you can ignore this email.</p>`,
     })
   );
 }
@@ -83,8 +95,13 @@ export function queuePasswordResetEmail(user: { name: string; email: string }, u
     sendEmail({
       to: user.email,
       subject: "Reset your School Ledger password",
-      text: `Hi ${name},\n\nUse this link to reset your School Ledger password:\n${url}\n\nIf you did not request this, you can ignore this email.`,
-      html: `<p>Hi ${escapeHtml(name)},</p><p>Use the link below to reset your School Ledger password.</p><p><a href="${safeUrl}">Reset password</a></p><p>If you did not request this, you can ignore this email.</p>`,
+      text: `Hi ${name},
+
+Tap the link below to choose a new School Ledger password:
+${url}
+
+If you did not request a password reset, you can safely ignore this email.`,
+      html: `<p>Hi ${escapeHtml(name)},</p><p>Tap the button below to choose a new School Ledger password.</p><p><a href="${safeUrl}" style="display:inline-block;padding:12px 18px;border-radius:10px;background:#15171a;color:#ffffff;text-decoration:none;font-weight:700;">Reset password</a></p><p style="color:#686d75;">If you did not request a password reset, you can safely ignore this email.</p>`,
     })
   );
 }
@@ -106,15 +123,20 @@ export async function sendStaffInviteEmail({
 
   return sendEmail({
     to: email,
-    subject: `You've been invited to ${organizationName} on School Ledger`,
+    subject: `You're invited to join ${organizationName}`,
     text: `Hi ${recipientName},
 
-You've been invited to join ${organizationName} as staff on School Ledger.
+You've been invited to join ${organizationName} on School Ledger.
 
 Use this exact email address to create your account or sign in:
+${email}
+
+Open School Ledger:
 ${loginUrl}
 
-As staff, you can sell items, add stock, and view inventory.`,
-    html: `<p>Hi ${safeName},</p><p>You've been invited to join <strong>${safeOrganization}</strong> as staff on <strong>School Ledger</strong>.</p><p>Use this exact email address to create your account or sign in.</p><p><a href="${loginUrl}">Open School Ledger</a></p><p>As staff, you can sell items, add stock, and view inventory.</p>`,
+As staff, you can record sales, add stock, and see what is in stock.
+
+If you were not expecting this invitation, you can ignore this email.`,
+    html: `<p>Hi ${safeName},</p><p>You've been invited to join <strong>${safeOrganization}</strong> on <strong>School Ledger</strong>.</p><p>Use this exact email address to create your account or sign in:<br><strong>${escapeHtml(email)}</strong></p><p><a href="${loginUrl}" style="display:inline-block;padding:12px 18px;border-radius:10px;background:#15171a;color:#ffffff;text-decoration:none;font-weight:700;">Join ${safeOrganization}</a></p><p>As staff, you can record sales, add stock, and see what is in stock.</p><p style="color:#686d75;">If you were not expecting this invitation, you can ignore this email.</p>`,
   });
 }
