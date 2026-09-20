@@ -81,7 +81,7 @@ Avoid exposing accounting terminology such as receivables, journal entries, debi
 ## Product Selection
 Prioritize in this order:
 
-1. scan code later
+1. scan barcode
 2. recent items
 3. frequently sold items
 4. search
@@ -89,14 +89,19 @@ Prioritize in this order:
 
 This minimizes typing.
 
-## QR Future
-Scanning should be a shortcut, not a separate complex workflow.
+## Barcode Scanning
+Scanning is a shortcut, not a separate workflow.
 
-Expected flow:
-
+Sell:
 Scan → Product → Quantity → Paid → Save
 
-If the camera fails, manual selection must always remain available.
+Add Stock:
+Scan → Product → Quantity → Save
+
+Unknown barcode for an owner:
+Scan → New item form with barcode prefilled → Create item
+
+If the camera fails, is denied, or cannot decode the barcode, manual selection must always remain available.
 
 ## Confirmation
 After saving, show a brief clear confirmation such as:
