@@ -75,7 +75,7 @@ Suggested fields:
 - updated_at
 
 ### scan_codes
-Future QR/barcode lookup aliases.
+QR/barcode lookup aliases used by the active mobile scanning flow.
 
 Suggested fields:
 - id
@@ -86,7 +86,7 @@ Suggested fields:
 - active
 - created_at
 
-Unique constraint should prevent ambiguous active codes within an organization.
+Active codes are unique within an organization so one scan cannot resolve to multiple variants. The same physical barcode value may exist in another organization without conflict.
 
 ### stock_movements
 Source of truth for inventory movement.
