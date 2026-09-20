@@ -527,3 +527,37 @@ button {
     width: 100%;
   }
 }
+
+
+.ownerLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.ownerLinks .inlineAction {
+  margin-top: 0;
+}
+
+.exportRow {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.exportAction {
+  min-height: 44px;
+  margin-top: 0;
+  padding: 0 14px;
+  white-space: nowrap;
+}
+
+@media (max-width: 520px) {
+  .exportRow {
+    grid-template-columns: 1fr;
+  }
+
+  .exportAction {
+    width: 100%;
+  }
+}
