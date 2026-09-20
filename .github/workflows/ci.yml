@@ -65,3 +65,31 @@ jobs:
 
       - name: Deploy Worker
         run: npm run deploy
+
+
+      - name: Production smoke and runtime diagnostics
+        run: |
+          set +e
+          timeout 20s npx wrangler tail store --format=json > /tmp/store-tail.log 2>&1 &
+          TAIL_PID=$!
+          sleep 4
+
+          curl -sS -D /tmp/store-headers.txt https://store.article6.org/login -o /tmp/store-body.html
+          CURL_STATUS=$?
+
+          sleep 5
+          kill $TAIL_PID 2>/dev/null || true
+
+          echo "=== RESPONSE HEADERS ==="
+          cat /tmp/store-headers.txt || true
+          echo "=== WORKER TAIL ==="
+          cat /tmp/store-tail.log || true
+
+          if [ "$CURL_STATUS" -ne 0 ]; then
+            exit "$CURL_STATUS"
+          fi
+
+          if ! grep -Eq "^HTTP/[0-9.]+ 2[0-9][0-9]" /tmp/store-headers.txt; then
+            echo "Production login smoke test failed."
+            exit 1
+          fi
