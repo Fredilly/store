@@ -3,21 +3,6 @@
 import { FormEvent, useState } from "react";
 import { authClient } from "../../lib/auth-client";
 
-function authErrorMessage(message?: string) {
-  const normalized = message?.toLowerCase() ?? "";
-
-  if (
-    normalized.includes("invalid") ||
-    normalized.includes("incorrect") ||
-    normalized.includes("password") ||
-    normalized.includes("credential")
-  ) {
-    return "Incorrect email or password.";
-  }
-
-  return message || "Could not sign in. Please try again.";
-}
-
 async function hasAuthenticatedSession() {
   const response = await fetch("/api/auth/get-session", {
     method: "GET",
@@ -48,6 +33,10 @@ export function LoginForm({ initialMessage = "" }: { initialMessage?: string }) 
   const [busy, setBusy] = useState(false);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
+    if (mode === "signin") {
+      return;
+    }
+
     event.preventDefault();
     setMessage("");
 
@@ -59,28 +48,17 @@ export function LoginForm({ initialMessage = "" }: { initialMessage?: string }) 
     setBusy(true);
 
     try {
-      const result =
-        mode === "signup"
-          ? await authClient.signUp.email({ name, email, password })
-          : await authClient.signIn.email({ email, password });
+      const result = await authClient.signUp.email({ name, email, password });
 
       if (result.error) {
-        setMessage(
-          mode === "signin"
-            ? authErrorMessage(result.error.message)
-            : result.error.message || "Could not create account."
-        );
+        setMessage(result.error.message || "Could not create account.");
         return;
       }
 
       const authenticated = await hasAuthenticatedSession();
 
       if (!authenticated) {
-        setMessage(
-          mode === "signin"
-            ? "Incorrect email or password."
-            : "Account created, but sign in did not complete. Please sign in."
-        );
+        setMessage("Account created, but sign in did not complete. Please sign in.");
         return;
       }
 
