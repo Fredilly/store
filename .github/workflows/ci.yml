@@ -37,6 +37,9 @@ jobs:
       - name: Apply D1 migrations to clean local database
         run: npm run db:migrate:local
 
+      - name: Core acceptance regression suite
+        run: npm run test:acceptance
+
       - name: Verify immutable-history database guards
         run: |
           npx wrangler d1 execute store-db --local --json --command "
