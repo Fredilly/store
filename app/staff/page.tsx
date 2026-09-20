@@ -16,8 +16,25 @@ type InviteRow = {
   created_at: string;
 };
 
-export default async function StaffPage() {
+const errorMessages: Record<string, string> = {
+  invite: "Could not create the invite. Please try again.",
+  member: "This person is already a staff member.",
+  pending: "This person has already been invited. You can resend the invite below.",
+  resend: "Could not resend the invitation email. Please try again.",
+};
+
+export default async function StaffPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{
+    error?: string;
+    invited?: string;
+    resent?: string;
+    mail?: string;
+  }>;
+}) {
   const tenant = await requirePageOwner();
+  const params = (await searchParams) ?? {};
   const database = db();
 
   const [staffResult, inviteResult] = await Promise.all([
@@ -48,8 +65,39 @@ export default async function StaffPage() {
       .all<InviteRow>(),
   ]);
 
+  const errorMessage = params.error ? errorMessages[params.error] : undefined;
+  const successMessage =
+    params.resent === "1"
+      ? "Invitation email resent."
+      : params.invited === "1" && params.mail !== "failed"
+        ? "Staff invite sent."
+        : undefined;
+  const warningMessage =
+    params.invited === "1" && params.mail === "failed"
+      ? "Invite created, but the email could not be sent. Use Resend invite below."
+      : undefined;
+
   return (
     <main className="shell">
+      {successMessage && (
+        <div className="toastBanner successBanner" role="status">
+          <span aria-hidden="true">✓</span>
+          <strong>{successMessage}</strong>
+        </div>
+      )}
+
+      {errorMessage && (
+        <div className="messageBanner errorBanner" role="alert">
+          <strong>{errorMessage}</strong>
+        </div>
+      )}
+
+      {warningMessage && (
+        <div className="messageBanner warningBanner" role="alert">
+          <strong>{warningMessage}</strong>
+        </div>
+      )}
+
       <div className="pageTop">
         <Link className="back" href="/">← Home</Link>
         <p className="eyebrow">Staff</p>
@@ -68,10 +116,10 @@ export default async function StaffPage() {
             Email
             <input name="email" type="email" inputMode="email" autoComplete="email" required />
           </label>
-          <button type="submit">Create invite</button>
+          <button type="submit">Send invite</button>
         </form>
         <p className="muted">
-          They should create or sign in to an account using this exact email.
+          We’ll email them an invitation. They should use this exact email to create or sign in to their account.
         </p>
       </section>
 
@@ -80,12 +128,18 @@ export default async function StaffPage() {
           <h2>Pending invites</h2>
           <div className="balanceList">
             {inviteResult.results.map((invite) => (
-              <div className="balanceRow" key={invite.id}>
+              <div className="balanceRow pendingInviteRow" key={invite.id}>
                 <div>
                   <strong>{invite.name}</strong>
                   <span>{invite.email}</span>
+                  <span>Pending</span>
                 </div>
-                <span>Pending</span>
+                <form action="/api/staff/invite/resend" method="post">
+                  <input type="hidden" name="invite_id" value={invite.id} />
+                  <button type="submit" className="buttonSecondary">
+                    Resend invite
+                  </button>
+                </form>
               </div>
             ))}
           </div>
