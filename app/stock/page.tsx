@@ -45,7 +45,7 @@ export default async function StockPage() {
               <input name="quantity" inputMode="numeric" min="1" type="number" defaultValue="1" required />
             </label>
             <label>
-              Unit cost, optional
+              Cost per item, optional
               <input name="unit_cost" inputMode="decimal" min="0" step="0.01" type="number" placeholder="0" />
             </label>
             <button type="submit">Save stock</button>
@@ -55,27 +55,32 @@ export default async function StockPage() {
 
       {tenant.role === "OWNER" && (
         <section className="panel secondaryPanel">
-          <h2>New item</h2>
+          <h2>Create new item</h2>
+          <p className="muted">Add the item and its starting stock in one step.</p>
           <form action="/api/products" method="post" className="form">
             <label>
               Item name
-              <input name="name" placeholder="School Uniform" required />
-            </label>
-            <label>
-              Size / class, optional
-              <input name="variant_name" placeholder="Size 10" />
-            </label>
-            <label>
-              Category, optional
-              <input name="category" placeholder="Uniform" />
-            </label>
-            <label>
-              Barcode, optional
-              <input id="new-item-barcode" name="barcode" autoComplete="off" placeholder="Scan or enter barcode" />
+              <input name="name" placeholder="English Textbook" required />
             </label>
             <label>
               Selling price
               <input name="selling_price" inputMode="decimal" min="0.01" step="0.01" type="number" placeholder="8000" required />
+            </label>
+            <label>
+              Size / class, optional
+              <input name="variant_name" placeholder="Size 10 or JSS 1" />
+            </label>
+            <label>
+              Barcode, optional
+              <input id="new-item-barcode" name="barcode" autoComplete="off" inputMode="numeric" placeholder="Scan above or type barcode" />
+            </label>
+            <label>
+              Starting stock
+              <input name="starting_stock" inputMode="numeric" min="0" type="number" defaultValue="0" required />
+            </label>
+            <label>
+              Cost price, optional
+              <input name="cost_price" inputMode="decimal" min="0" step="0.01" type="number" placeholder="0" />
             </label>
             <button type="submit" className="buttonSecondary">Create item</button>
           </form>
