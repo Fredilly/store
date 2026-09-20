@@ -52,6 +52,7 @@ export function LoginForm({
           credentials: "include",
           headers: {
             Accept: "application/json",
+            "X-School-Ledger-Client": "fetch",
           },
         });
 
