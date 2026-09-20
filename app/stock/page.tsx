@@ -54,7 +54,7 @@ export default async function StockPage() {
       </section>
 
       {tenant.role === "OWNER" && (
-        <section className="panel secondaryPanel">
+        <section className="panel secondaryPanel" id="new-item">
           <h2>Create new item</h2>
           <p className="muted">Add the item and its starting stock in one step.</p>
           <form action="/api/products" method="post" className="form">
