@@ -6,7 +6,7 @@ import { requirePageTenant } from "../lib/tenant";
 const baseActions = [
   { label: "Sell Item", href: "/sell", detail: "Record a sale" },
   { label: "Add Stock", href: "/stock", detail: "Record items received" },
-  { label: "Inventory", href: "/inventory", detail: "See what is left" },
+  { label: "Stock", href: "/inventory", detail: "See what you have" },
 ];
 
 const successMessages: Record<string, string> = {
