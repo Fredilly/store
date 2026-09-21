@@ -15,7 +15,7 @@ Secret values must never be committed to Git.
 - `CLOUDFLARE_API_TOKEN` (GitHub Actions)
 - `CLOUDFLARE_ACCOUNT_ID` (GitHub Actions)
 
-Google OAuth remains optional until issue #26 is completed:
+Google OAuth is optional convenience and must never replace the email/password fallback:
 
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
@@ -63,4 +63,4 @@ Temporary workers.dev and localhost origins are development-only.
 
 D1 migrations are applied before deployment. Existing export and D1 recovery procedures remain the recovery path for data.
 
-Google sign-in is intentionally tracked separately in issue #26 and must not block email/password production use.
+Google sign-in remains secondary to email/password. Keep issue #26 open until one real production Google login succeeds end-to-end.
