@@ -6,6 +6,7 @@ const errorMessages: Record<string, string> = {
   unavailable: "Could not sign in. Please try again.",
   signup: "Could not create account. Please check your details and try again.",
   passwords: "Passwords do not match.",
+  existing: "This email already has an account. Sign in instead.",
 };
 
 export default async function LoginPage({
@@ -19,10 +20,14 @@ export default async function LoginPage({
   const initialEmail = decodeURIComponent(
     cookieStore.get("login_email")?.value ?? ""
   );
+  const initialName = decodeURIComponent(
+    cookieStore.get("signup_name")?.value ?? ""
+  );
 
   return (
     <LoginForm
       initialEmail={initialEmail}
+      initialName={initialName}
       initialMessage={initialMessage}
       initialMode={params.mode === "signup" ? "signup" : "signin"}
     />
