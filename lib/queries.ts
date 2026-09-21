@@ -38,28 +38,43 @@ export async function listVariants(orgId: string): Promise<VariantOption[]> {
         END AS label,
         v.selling_price_minor,
         p.category,
-        COALESCE(SUM(m.quantity_delta), 0) AS stock,
-        COUNT(DISTINCT CASE WHEN s.status = 'COMPLETED' THEN si.sale_id END) AS sale_count,
-        MAX(CASE WHEN s.status = 'COMPLETED' THEN s.created_at END) AS last_sold_at
+        COALESCE((
+          SELECT SUM(m.quantity_delta)
+          FROM stock_movements m
+          WHERE m.product_variant_id = v.id
+            AND m.organization_id = v.organization_id
+        ), 0) AS stock,
+        COALESCE((
+          SELECT COUNT(DISTINCT si.sale_id)
+          FROM sale_items si
+          JOIN sales s
+            ON s.id = si.sale_id
+           AND s.organization_id = si.organization_id
+          WHERE si.product_variant_id = v.id
+            AND si.organization_id = v.organization_id
+            AND s.status = 'COMPLETED'
+        ), 0) AS sale_count,
+        (
+          SELECT MAX(s.created_at)
+          FROM sale_items si
+          JOIN sales s
+            ON s.id = si.sale_id
+           AND s.organization_id = si.organization_id
+          WHERE si.product_variant_id = v.id
+            AND si.organization_id = v.organization_id
+            AND s.status = 'COMPLETED'
+        ) AS last_sold_at
       FROM product_variants v
-      JOIN products p ON p.id = v.product_id
-      LEFT JOIN stock_movements m
-        ON m.product_variant_id = v.id
-        AND m.organization_id = v.organization_id
-      LEFT JOIN sale_items si
-        ON si.product_variant_id = v.id
-        AND si.organization_id = v.organization_id
-      LEFT JOIN sales s
-        ON s.id = si.sale_id
-        AND s.organization_id = v.organization_id
+      JOIN products p
+        ON p.id = v.product_id
+       AND p.organization_id = v.organization_id
       WHERE v.organization_id = ?
         AND v.active = 1
         AND p.active = 1
-      GROUP BY v.id, p.name, p.category, v.variant_name, v.selling_price_minor
       ORDER BY
-        CASE WHEN MAX(CASE WHEN s.status = 'COMPLETED' THEN s.created_at END) IS NULL THEN 1 ELSE 0 END,
-        MAX(CASE WHEN s.status = 'COMPLETED' THEN s.created_at END) DESC,
-        COUNT(DISTINCT CASE WHEN s.status = 'COMPLETED' THEN si.sale_id END) DESC,
+        CASE WHEN last_sold_at IS NULL THEN 1 ELSE 0 END,
+        last_sold_at DESC,
+        sale_count DESC,
         p.name,
         v.variant_name`
     )
