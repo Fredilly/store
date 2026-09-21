@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getAuth } from "./auth";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { db } from "./db";
 
 type PlatformEnv = {
@@ -8,7 +9,7 @@ type PlatformEnv = {
 };
 
 function configuredAdminEmails() {
-  const { env } = require("@opennextjs/cloudflare").getCloudflareContext();
+  const { env } = getCloudflareContext();
   const runtime = env as PlatformEnv;
 
   return new Set(
