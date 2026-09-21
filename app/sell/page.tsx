@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Icon } from "../../components/Icon";
 import { listVariants } from "../../lib/queries";
-import { formatNaira } from "../../lib/money";
 import { requirePageTenant } from "../../lib/tenant";
 import { BarcodeScanner } from "../../components/BarcodeScanner";
 import { ItemPicker } from "../../components/item-picker";
