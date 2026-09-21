@@ -63,6 +63,8 @@ function queueEmail(task: Promise<unknown>) {
 }
 
 export function queueWelcomeEmail(user: { name: string; email: string }) {
+  if (user.email.toLowerCase().endsWith(".invalid")) return;
+
   const name = user.name.trim() || "there";
   const appUrl = "https://store.article6.org/";
 
