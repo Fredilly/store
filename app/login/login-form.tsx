@@ -6,14 +6,16 @@ import { BrandMark, WelcomeArtwork } from "../../components/BrandMark";
 export function LoginForm({
   initialMessage = "",
   initialEmail = "",
+  initialName = "",
   initialMode = "signin",
 }: {
   initialMessage?: string;
   initialEmail?: string;
+  initialName?: string;
   initialMode?: "signin" | "signup";
 }) {
   const [mode] = useState<"signin" | "signup">(initialMode);
-  const [name, setName] = useState("");
+  const [name, setName] = useState(initialName);
   const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
