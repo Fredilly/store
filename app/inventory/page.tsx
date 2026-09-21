@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Icon } from "../../components/Icon";
+import { InventoryBrowser } from "../../components/inventory-browser";
 import { listVariants } from "../../lib/queries";
-import { formatNaira } from "../../lib/money";
 import { requirePageTenant } from "../../lib/tenant";
 
 export default async function InventoryPage() {
@@ -14,26 +14,17 @@ export default async function InventoryPage() {
         <Link className="back" href="/"><Icon name="home" size={19} className="backIcon" /><span>Home</span></Link>
         <p className="eyebrow">Stock</p>
         <h1>What you have</h1>
+        <p className="muted">Search by item name or category. Low and out-of-stock items are one tap away.</p>
       </div>
 
-      <section className="list">
-        {variants.length === 0 ? (
-          <div className="panel">
-            <p className="muted">No items yet.</p>
-            <Link className="inlineAction" href="/stock">Create an item →</Link>
-          </div>
-        ) : (
-          variants.map((item) => (
-            <article className="inventoryRow" key={item.id}>
-              <div>
-                <strong>{item.label}</strong>
-                <span>Selling price · {formatNaira(item.selling_price_minor)}</span>
-              </div>
-              <div className="stockCount"><b className={item.stock <= 2 ? "lowStock" : ""}>{item.stock}</b><span>in stock</span></div>
-            </article>
-          ))
-        )}
-      </section>
+      {variants.length === 0 ? (
+        <div className="panel">
+          <p className="muted">No items yet.</p>
+          <Link className="inlineAction" href="/stock">Create an item →</Link>
+        </div>
+      ) : (
+        <InventoryBrowser items={variants} />
+      )}
     </main>
   );
 }
