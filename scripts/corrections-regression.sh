@@ -103,7 +103,7 @@ run_sql "
     id, organization_id, actor_user_id, event_type, entity_type, entity_id, metadata_json
   ) VALUES (
     'qa_corr_audit', 'qa_corrections_org', 'qa_owner', 'SALE_VOIDED', 'sale',
-    'qa_corr_sale', '{"reason":"Entered by mistake"}'
+    'qa_corr_sale', '{}'
   );
 "
 
