@@ -36,7 +36,7 @@ export function LoginForm({
       await authClient.signIn.social({
         provider: "google",
         callbackURL: "/",
-        errorCallbackURL: "/login?error=google",
+        errorCallbackURL: "/login",
       });
     } catch {
       setMessage("Could not sign in with Google. Try email and password instead.");
