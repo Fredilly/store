@@ -1,37 +1,18 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { authClient } from "../../lib/auth-client";
 import { BrandMark, WelcomeArtwork } from "../../components/BrandMark";
-
-async function hasAuthenticatedSession() {
-  const response = await fetch("/api/auth/get-session", {
-    method: "GET",
-    credentials: "include",
-    cache: "no-store",
-    headers: {
-      Accept: "application/json",
-    },
-  });
-
-  if (!response.ok) return false;
-
-  const data = (await response.json()) as {
-    session?: unknown;
-    user?: unknown;
-  } | null;
-
-  return Boolean(data?.session && data?.user);
-}
 
 export function LoginForm({
   initialMessage = "",
   initialEmail = "",
+  initialMode = "signin",
 }: {
   initialMessage?: string;
   initialEmail?: string;
+  initialMode?: "signin" | "signup";
 }) {
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode] = useState<"signin" | "signup">(initialMode);
   const [name, setName] = useState("");
   const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
@@ -80,37 +61,9 @@ export function LoginForm({
       return;
     }
 
-    event.preventDefault();
-    setMessage("");
-
-    if (password !== confirmPassword) {
-      setMessage("Passwords do not match.");
-      return;
-    }
-
-    setBusy(true);
-
-    try {
-      const result = await authClient.signUp.email({ name, email, password });
-
-      if (result.error) {
-        setMessage(result.error.message || "Could not create account.");
-        return;
-      }
-
-      const authenticated = await hasAuthenticatedSession();
-
-      if (!authenticated) {
-        setMessage("Account created, but sign in did not complete. Please sign in.");
-        return;
-      }
-
-      window.location.assign("/");
-    } catch {
-      setMessage("Could not connect. Check your connection and try again.");
-    } finally {
-      setBusy(false);
-    }
+    // Sign-up intentionally falls through to the native form POST.
+    // This keeps account creation working on older browsers when hydration fails.
+    return;
   }
 
   return (
@@ -133,12 +86,13 @@ export function LoginForm({
             : "Start with your first item. We’ll guide you step by step."}
         </p>
 
-        <form action="/api/login" className="form authForm" method="post" onSubmit={submit}>
+        <form action={mode === "signin" ? "/api/login" : "/api/signup"} className="form authForm" method="post" onSubmit={submit}>
           {mode === "signup" && (
             <label>
               Your name
               <input
                 autoComplete="name"
+                name="name"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
                 required
@@ -178,6 +132,7 @@ export function LoginForm({
               <input
                 autoComplete="new-password"
                 minLength={8}
+                name="confirm_password"
                 type="password"
                 value={confirmPassword}
                 onChange={(event) => setConfirmPassword(event.target.value)}
@@ -207,20 +162,14 @@ export function LoginForm({
           </a>
         )}
 
-        <button
+        <a
           className="textButton"
-          type="button"
-          onClick={() => {
-            setMode(mode === "signin" ? "signup" : "signin");
-            setMessage("");
-            setPassword("");
-            setConfirmPassword("");
-          }}
+          href={mode === "signin" ? "/login?mode=signup" : "/login"}
         >
           {mode === "signin"
             ? "First time? Create account"
             : "Already have an account? Sign in"}
-        </button>
+        </a>
       </section>
     </main>
   );
