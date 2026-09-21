@@ -23,7 +23,7 @@ const eventLabels: Record<string, string> = {
   EXPENSE_RECORDED: "Recorded an expense",
   STAFF_INVITED: "Invited staff",
   STAFF_INVITE_ACCEPTED: "Accepted a staff invite",
-  STAFF_STATUS_CHANGED: "Changed staff access",
+  STAFF_STATUS_CHANGED: "Changed staff access",\n  SALE_VOIDED: "Voided a sale",\n  PAYMENT_CORRECTED: "Corrected money received",\n  STOCK_CORRECTED: "Corrected stock",
 };
 
 function describeMetadata(value: string | null) {
