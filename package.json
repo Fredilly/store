@@ -31,7 +31,8 @@
     "test:item-search": "bash scripts/item-search-regression.sh",
     "test:mobile-app": "bash scripts/mobile-app-regression.sh",
     "test:production": "bash scripts/production-hardening-regression.sh",
-    "test:google-oauth": "bash scripts/google-oauth-regression.sh"
+    "test:google-oauth": "bash scripts/google-oauth-regression.sh",
+    "test:v1-release": "bash scripts/v1-release-regression.sh"
   },
   "dependencies": {
     "@opennextjs/cloudflare": "1.20.6",
