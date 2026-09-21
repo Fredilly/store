@@ -159,7 +159,8 @@ export default async function Home({
 
           {tenant.role === "OWNER" && (
             <div className="ownerLinks">
-              <a className="inlineAction" href="/staff">Manage staff →</a>\n              <a className="inlineAction" href="/history">History →</a>
+              <a className="inlineAction" href="/staff">Manage staff →</a>
+              <a className="inlineAction" href="/history">History →</a>
               <a className="inlineAction" href="/corrections">Fix a mistake →</a>
               <a className="inlineAction" href="/export">Export records →</a>
             </div>
