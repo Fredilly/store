@@ -16,18 +16,27 @@ function runtimeEnv(): AuthEnv {
 
 function createAuth() {
   const runtime = runtimeEnv();
+  const isProduction = runtime.BETTER_AUTH_URL === "https://store.article6.org";
+
+  if (isProduction && !runtime.BETTER_AUTH_SECRET) {
+    throw new Error("BETTER_AUTH_SECRET is required in production");
+  }
   const googleConfigured = Boolean(
     runtime.GOOGLE_CLIENT_ID && runtime.GOOGLE_CLIENT_SECRET
   );
 
   const trustedOrigins = Array.from(
     new Set(
-      [
-        runtime.BETTER_AUTH_URL,
-        "https://store.article6.org",
-        "https://store.fredilly.workers.dev",
-        "http://localhost:3000",
-      ].filter((value): value is string => Boolean(value))
+      (
+        isProduction
+          ? [runtime.BETTER_AUTH_URL, "https://store.article6.org"]
+          : [
+              runtime.BETTER_AUTH_URL,
+              "https://store.article6.org",
+              "https://store.fredilly.workers.dev",
+              "http://localhost:3000",
+            ]
+      ).filter((value): value is string => Boolean(value))
     )
   );
 
