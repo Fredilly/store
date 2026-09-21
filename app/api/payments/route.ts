@@ -35,15 +35,13 @@ export async function POST(request: Request) {
     .prepare(
       `SELECT
         s.total_minor,
-        COALESCE(SUM(p.amount_minor), 0) AS paid_minor
+        COALESCE((SELECT SUM(p.amount_minor) FROM payments p WHERE p.organization_id = s.organization_id AND p.sale_id = s.id), 0)
+        + COALESCE((SELECT SUM(a.amount_delta_minor) FROM payment_adjustments a WHERE a.organization_id = s.organization_id AND a.sale_id = s.id), 0)
+        AS paid_minor
       FROM sales s
-      LEFT JOIN payments p
-        ON p.sale_id = s.id
-        AND p.organization_id = s.organization_id
       WHERE s.id = ?
         AND s.organization_id = ?
-        AND s.status = 'COMPLETED'
-      GROUP BY s.id, s.total_minor`
+        AND s.status = 'COMPLETED'`
     )
     .bind(saleId, tenant.orgId)
     .first<{ total_minor: number; paid_minor: number }>();
