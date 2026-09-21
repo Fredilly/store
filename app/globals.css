@@ -1477,3 +1477,315 @@ button[aria-busy="true"] {
     grid-template-columns: 1fr 1fr;
   }
 }
+
+
+/* Desktop-only polish. Mobile/tablet rules above remain unchanged. */
+@media (min-width: 900px) {
+  body {
+    background:
+      radial-gradient(circle at 12% 0%, rgba(37, 86, 216, 0.045), transparent 30%),
+      #f6f7f9;
+  }
+
+  .shell {
+    width: min(100%, 1040px);
+    padding: 64px 40px 84px;
+  }
+
+  .adminShell {
+    width: min(100%, 1180px);
+  }
+
+  .header,
+  .pageTop {
+    max-width: 780px;
+    padding: 10px 4px 32px;
+  }
+
+  h1 {
+    font-size: clamp(3.25rem, 5vw, 4.75rem);
+    line-height: 0.98;
+    letter-spacing: -0.055em;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  .muted {
+    max-width: 680px;
+    font-size: 1.05rem;
+  }
+
+  .summary {
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .summary div {
+    min-height: 122px;
+    padding: 22px 20px;
+    border-radius: 20px;
+    box-shadow: 0 10px 28px rgba(20, 24, 32, 0.035);
+  }
+
+  .summary span {
+    font-size: 0.95rem;
+  }
+
+  .summary strong {
+    margin-top: 10px;
+    font-size: 1.8rem;
+  }
+
+  .actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .action {
+    min-height: 168px;
+    padding: 26px;
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(20, 24, 32, 0.045);
+  }
+
+  .actionTitle {
+    gap: 14px;
+  }
+
+  .actionTitle .actionIcon {
+    width: 34px;
+    height: 34px;
+  }
+
+  .action strong {
+    font-size: 1.6rem;
+  }
+
+  .action span {
+    margin-top: 10px;
+    font-size: 1.02rem;
+  }
+
+  .ownerLinks {
+    gap: 12px;
+    margin-top: 22px;
+  }
+
+  .ownerLinks .inlineAction {
+    min-height: 50px;
+    padding: 0 18px;
+    border: 1px solid #d9dee5;
+    background: #fff;
+    color: #2556d8;
+    box-shadow: 0 6px 18px rgba(20, 24, 32, 0.035);
+  }
+
+  .panel {
+    padding: 28px;
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(20, 24, 32, 0.04);
+  }
+
+  .secondaryPanel {
+    margin-top: 20px;
+  }
+
+  .panel > .form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px 18px;
+  }
+
+  .panel > .form > button,
+  .panel > .form > .buttonSecondary {
+    grid-column: 1 / -1;
+  }
+
+  .form input,
+  .form select,
+  .balancePay input,
+  .itemSearchInput {
+    min-height: 62px;
+    border-radius: 15px;
+  }
+
+  .inventoryTools {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .inventoryRow {
+    min-height: 92px;
+    padding: 20px 22px;
+    border-radius: 18px;
+  }
+
+  .inventoryRow strong {
+    font-size: 1.16rem;
+  }
+
+  .inventoryRow b,
+  .stockCount b {
+    font-size: 1.9rem;
+  }
+
+  .moneyGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .moneyCard {
+    min-height: 170px;
+    padding: 24px;
+    border-radius: 22px;
+    box-shadow: 0 10px 28px rgba(20, 24, 32, 0.035);
+  }
+
+  .moneyCard strong {
+    font-size: 2.2rem;
+  }
+
+  .balanceRow {
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
+    align-items: center;
+    gap: 24px;
+    padding: 18px 0;
+  }
+
+  .reviewList .balanceRow,
+  .historyDetails {
+    grid-template-columns: 1fr;
+  }
+
+  .historyRow {
+    padding: 18px 2px;
+  }
+
+  .historyRow summary {
+    align-items: center;
+  }
+
+  .historyRow strong {
+    font-size: 1.08rem;
+  }
+
+  .historyActions {
+    gap: 12px;
+    margin-top: 22px;
+  }
+
+  .firstRun {
+    max-width: 780px;
+    padding: 34px;
+    border-radius: 26px;
+  }
+
+  .firstSaleHint {
+    padding: 18px 20px;
+    border-radius: 18px;
+  }
+
+  .authShell {
+    width: min(100%, 540px);
+    padding: 48px 24px;
+  }
+
+  .authCard {
+    padding: 36px;
+    border-radius: 28px;
+    box-shadow: 0 20px 60px rgba(20, 24, 32, 0.08);
+  }
+
+  .authShellWelcome {
+    width: min(100%, 1120px);
+    grid-template-columns: minmax(0, 1.15fr) minmax(400px, 480px);
+    gap: 68px;
+  }
+
+  .welcomeIntro {
+    padding: 40px 0;
+  }
+
+  .welcomeIntro h1 {
+    max-width: 680px;
+    font-size: clamp(4rem, 6vw, 5.5rem);
+  }
+
+  .welcomeIntro > p {
+    font-size: 1.15rem;
+  }
+
+  .welcomeArtwork {
+    margin-top: 42px;
+    gap: 14px;
+  }
+
+  .welcomeFlowCard {
+    min-height: 148px;
+    padding: 22px;
+    border-radius: 22px;
+  }
+
+  .adminSummary {
+    max-width: 760px;
+  }
+
+  .adminSchoolList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .adminSchoolCard {
+    min-height: 260px;
+  }
+
+  .adminMetrics {
+    gap: 10px;
+  }
+
+  .adminMetrics div {
+    padding: 14px;
+    border-radius: 16px;
+  }
+}
+
+@media (min-width: 900px) and (hover: hover) and (pointer: fine) {
+  .action,
+  .panel,
+  .inventoryRow,
+  .moneyCard,
+  .ownerLinks .inlineAction,
+  .googleButton,
+  button,
+  .inlineAction {
+    transition:
+      transform 160ms ease,
+      box-shadow 160ms ease,
+      border-color 160ms ease,
+      background-color 160ms ease;
+  }
+
+  .action:hover,
+  .inventoryRow:hover,
+  .moneyCard:hover,
+  .adminSchoolCard:hover {
+    transform: translateY(-2px);
+    border-color: #cbd2dc;
+    box-shadow: 0 16px 38px rgba(20, 24, 32, 0.075);
+  }
+
+  .ownerLinks .inlineAction:hover,
+  .googleButton:hover {
+    transform: translateY(-1px);
+    border-color: #bfc8d5;
+    box-shadow: 0 10px 24px rgba(20, 24, 32, 0.07);
+  }
+
+  button:hover:not(:disabled),
+  .inlineAction:hover {
+    transform: translateY(-1px);
+  }
+}
