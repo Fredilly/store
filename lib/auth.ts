@@ -27,12 +27,16 @@ function createAuth() {
 
   const trustedOrigins = Array.from(
     new Set(
-      [
-        runtime.BETTER_AUTH_URL,
-        "https://store.article6.org",
-        "https://store.fredilly.workers.dev",
-        "http://localhost:3000",
-      ].filter((value): value is string => Boolean(value))
+      (
+        isProduction
+          ? [runtime.BETTER_AUTH_URL, "https://store.article6.org"]
+          : [
+              runtime.BETTER_AUTH_URL,
+              "https://store.article6.org",
+              "https://store.fredilly.workers.dev",
+              "http://localhost:3000",
+            ]
+      ).filter((value): value is string => Boolean(value))
     )
   );
 
