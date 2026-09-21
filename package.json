@@ -14,7 +14,7 @@
     "typecheck": "tsc --noEmit",
     "test:core": "bash scripts/core-regression.sh",
     "test:authz": "bash scripts/authz-regression.sh",
-    "test:acceptance": "npm run test:authz && npm run test:core && npm run test:product-setup && npm run test:onboarding && npm run test:readability && npm run test:icons && npm run test:icon-visibility && npm run test:form-readability && npm run test:welcome-branding && npm run test:email-copy && npm run test:signup && npm run test:signup-errors && npm run test:corrections && npm run test:fraud-visibility",
+    "test:acceptance": "npm run test:authz && npm run test:core && npm run test:product-setup && npm run test:onboarding && npm run test:readability && npm run test:icons && npm run test:icon-visibility && npm run test:form-readability && npm run test:welcome-branding && npm run test:email-copy && npm run test:signup && npm run test:signup-errors && npm run test:corrections && npm run test:fraud-visibility && npm run test:history",
     "test:product-setup": "bash scripts/product-setup-regression.sh",
     "test:onboarding": "bash scripts/onboarding-regression.sh",
     "test:readability": "bash scripts/readability-regression.sh",
@@ -26,7 +26,8 @@
     "test:signup": "bash scripts/signup-regression.sh",
     "test:signup-errors": "bash scripts/signup-error-regression.sh",
     "test:corrections": "bash scripts/corrections-regression.sh",
-    "test:fraud-visibility": "bash scripts/fraud-visibility-regression.sh"
+    "test:fraud-visibility": "bash scripts/fraud-visibility-regression.sh",
+    "test:history": "bash scripts/history-regression.sh"
   },
   "dependencies": {
     "@opennextjs/cloudflare": "1.20.6",
