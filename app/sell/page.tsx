@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { Icon } from "../../components/Icon";
 import { listVariants } from "../../lib/queries";
-import { formatNaira } from "../../lib/money";
 import { requirePageTenant } from "../../lib/tenant";
 import { BarcodeScanner } from "../../components/BarcodeScanner";
+import { ItemPicker } from "../../components/item-picker";
 
 export default async function SellPage() {
   const tenant = await requirePageTenant();
@@ -33,13 +33,7 @@ export default async function SellPage() {
             <input type="hidden" name="submission_key" value={submissionKey} />
             <label>
               Item
-              <select id="sell-variant" name="variant_id" required>
-                {variants.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.label} · {formatNaira(item.selling_price_minor)} · {item.stock} left
-                  </option>
-                ))}
-              </select>
+              <ItemPicker items={variants} selectId="sell-variant" includeZeroStock={false} />
             </label>
             <label>
               Quantity

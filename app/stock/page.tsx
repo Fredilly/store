@@ -3,6 +3,7 @@ import { Icon } from "../../components/Icon";
 import { listVariants } from "../../lib/queries";
 import { requirePageTenant } from "../../lib/tenant";
 import { BarcodeScanner } from "../../components/BarcodeScanner";
+import { ItemPicker } from "../../components/item-picker";
 
 export default async function StockPage() {
   const tenant = await requirePageTenant();
@@ -33,13 +34,7 @@ export default async function StockPage() {
           <form action="/api/stock" method="post" className="form">
             <label>
               Item
-              <select id="stock-variant" name="variant_id" required>
-                {variants.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.label} · {item.stock} left
-                  </option>
-                ))}
-              </select>
+              <ItemPicker items={variants} selectId="stock-variant" />
             </label>
             <label>
               Quantity received
