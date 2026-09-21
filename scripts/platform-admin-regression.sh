@@ -5,7 +5,7 @@ grep -q 'PLATFORM_ADMIN_EMAILS' lib/platform-admin.ts
 grep -q 'redirect("/")' lib/platform-admin.ts
 grep -q 'PLATFORM_DASHBOARD_VIEWED' lib/platform-admin.ts
 grep -q 'platform_admin_audit' migrations/0009_platform_admin_audit.sql
-grep -q 'WHERE o.id != '''org_default'''' lib/platform-admin-queries.ts
+grep -Fq "WHERE o.id != 'org_default'" lib/platform-admin-queries.ts
 grep -q 'ownerEmail' lib/platform-admin-queries.ts
 grep -q 'staffCount' lib/platform-admin-queries.ts
 grep -q 'itemCount' lib/platform-admin-queries.ts
