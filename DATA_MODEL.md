@@ -161,7 +161,23 @@ Suggested fields:
 - received_by_user_id
 - created_at
 
-Outstanding balance = sale total - non-voided payments.
+Outstanding balance = sale total - effective payments.
+
+### payment_adjustments
+Append-only corrections to money received. Original payments are never edited or deleted.
+
+Fields include:
+- id
+- organization_id
+- sale_id
+- related_payment_id optional
+- amount_delta_minor (signed)
+- reason
+- created_by_user_id
+- created_at
+
+Effective payments = SUM(payments.amount_minor) + SUM(payment_adjustments.amount_delta_minor).
+A voided sale appends a negative adjustment for any money previously recorded and appends `VOID_REVERSAL` stock movements to restore sold units.
 
 ### expenses
 Simple shop expenses, not full accounting.
@@ -204,6 +220,7 @@ Examples:
 - stock_movements(organization_id, product_variant_id, created_at)
 - sales(organization_id, created_at)
 - payments(organization_id, sale_id)
+- payment_adjustments(organization_id, sale_id, created_at)
 - audit_events(organization_id, created_at)
 
 ## Deletion Policy
