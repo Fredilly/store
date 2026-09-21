@@ -118,6 +118,86 @@ jobs:
               ) AS users_without_credential;
           '
 
+      - name: Production signup and login round-trip
+        run: |
+          set -euo pipefail
+
+          QA_EMAIL="qa-auth-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}@example.invalid"
+          QA_PASSWORD="QaRoundTrip-9x7m!"
+
+          cleanup() {
+            npx wrangler d1 execute store-db --remote --command "
+              DELETE FROM session
+              WHERE userId IN (SELECT id FROM \"user\" WHERE email = '${QA_EMAIL}');
+              DELETE FROM account
+              WHERE userId IN (SELECT id FROM \"user\" WHERE email = '${QA_EMAIL}');
+              DELETE FROM organization_members
+              WHERE user_id IN (SELECT id FROM \"user\" WHERE email = '${QA_EMAIL}');
+              DELETE FROM \"user\" WHERE email = '${QA_EMAIL}';
+            " >/dev/null 2>&1 || true
+          }
+
+          trap cleanup EXIT
+          cleanup
+
+          curl -sS -D /tmp/qa-signup-headers.txt \
+            -o /tmp/qa-signup-body.txt \
+            -X POST \
+            -H "Content-Type: application/x-www-form-urlencoded" \
+            --data-urlencode "name=QA Auth Round Trip" \
+            --data-urlencode "email=${QA_EMAIL}" \
+            --data-urlencode "password=${QA_PASSWORD}" \
+            --data-urlencode "confirm_password=${QA_PASSWORD}" \
+            https://store.article6.org/api/signup
+
+          if ! grep -Eq "^HTTP/[0-9.]+ 303" /tmp/qa-signup-headers.txt; then
+            echo "Production signup did not return 303."
+            cat /tmp/qa-signup-headers.txt
+            cat /tmp/qa-signup-body.txt
+            exit 1
+          fi
+
+          npx wrangler d1 execute store-db --remote --json --command "
+            SELECT COUNT(*) AS credential_accounts
+            FROM account a
+            JOIN \"user\" u ON u.id = a.userId
+            WHERE u.email = '${QA_EMAIL}'
+              AND a.providerId = 'credential'
+              AND a.password IS NOT NULL;
+          " > /tmp/qa-credential.json
+
+          cat /tmp/qa-credential.json
+
+          if ! grep -Eq '"credential_accounts"[[:space:]]*:[[:space:]]*1' /tmp/qa-credential.json; then
+            echo "Signup did not create a credential/password account."
+            exit 1
+          fi
+
+          curl -sS -D /tmp/qa-login-headers.txt \
+            -o /tmp/qa-login-body.json \
+            -X POST \
+            -H "Accept: application/json" \
+            -H "X-School-Ledger-Client: fetch" \
+            -H "Content-Type: application/x-www-form-urlencoded" \
+            --data-urlencode "email=${QA_EMAIL}" \
+            --data-urlencode "password=${QA_PASSWORD}" \
+            https://store.article6.org/api/login
+
+          cat /tmp/qa-login-headers.txt
+          cat /tmp/qa-login-body.json
+
+          if ! grep -Eq "^HTTP/[0-9.]+ 200" /tmp/qa-login-headers.txt; then
+            echo "Fresh signup could not sign back in with the same password."
+            exit 1
+          fi
+
+          if ! grep -q '"ok":true' /tmp/qa-login-body.json; then
+            echo "Fresh signup login response did not report ok=true."
+            exit 1
+          fi
+
+          echo "PASS: production signup -> credential -> login round-trip"
+
       - name: Production smoke and runtime diagnostics
         run: |
           set +e

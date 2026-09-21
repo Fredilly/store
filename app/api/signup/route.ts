@@ -56,25 +56,36 @@ export async function POST(request: Request) {
   }
 
   try {
-    const result = await getAuth().api.signUpEmail({
+    await getAuth().api.signUpEmail({
       body: { name, email, password },
       headers: request.headers,
-      returnHeaders: true,
     });
+
+    // Do not report signup success until the exact submitted password
+    // can authenticate the newly created account.
+    const signInResponse = await getAuth().api.signInEmail({
+      body: { email, password },
+      asResponse: true,
+    });
+
+    if (!signInResponse.ok) {
+      console.error("Signup credential verification failed", { email });
+      return redirectWithError(request, "signup", values);
+    }
 
     const headers = new Headers({
       Location: new URL("/", request.url).toString(),
     });
 
     const getSetCookie = (
-      result.headers as Headers & { getSetCookie?: () => string[] }
+      signInResponse.headers as Headers & { getSetCookie?: () => string[] }
     ).getSetCookie;
 
     const authCookies =
       typeof getSetCookie === "function"
-        ? getSetCookie.call(result.headers)
-        : result.headers.get("set-cookie")
-          ? [result.headers.get("set-cookie")!]
+        ? getSetCookie.call(signInResponse.headers)
+        : signInResponse.headers.get("set-cookie")
+          ? [signInResponse.headers.get("set-cookie")!]
           : [];
 
     for (const cookie of authCookies) headers.append("Set-Cookie", cookie);
