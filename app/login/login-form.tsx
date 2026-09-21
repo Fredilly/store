@@ -2,17 +2,20 @@
 
 import { FormEvent, useState } from "react";
 import { BrandMark, WelcomeArtwork } from "../../components/BrandMark";
+import { authClient } from "../../lib/auth-client";
 
 export function LoginForm({
   initialMessage = "",
   initialEmail = "",
   initialName = "",
   initialMode = "signin",
+  googleEnabled = false,
 }: {
   initialMessage?: string;
   initialEmail?: string;
   initialName?: string;
   initialMode?: "signin" | "signup";
+  googleEnabled?: boolean;
 }) {
   const [mode] = useState<"signin" | "signup">(initialMode);
   const [name, setName] = useState(initialName);
@@ -21,6 +24,25 @@ export function LoginForm({
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState(initialMessage);
   const [busy, setBusy] = useState(false);
+  const [googleBusy, setGoogleBusy] = useState(false);
+
+  async function signInWithGoogle() {
+    if (googleBusy) return;
+
+    setMessage("");
+    setGoogleBusy(true);
+
+    try {
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/",
+        errorCallbackURL: "/login?error=google",
+      });
+    } catch {
+      setMessage("Could not sign in with Google. Try email and password instead.");
+      setGoogleBusy(false);
+    }
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     if (mode === "signin") {
@@ -87,6 +109,20 @@ export function LoginForm({
             ? "Sign in to continue."
             : "Start with your first item. We’ll guide you step by step."}
         </p>
+
+        {googleEnabled && (
+          <div className="socialAuth">
+            <button
+              className="googleButton"
+              type="button"
+              onClick={signInWithGoogle}
+              disabled={googleBusy}
+            >
+              {googleBusy ? "Opening Google…" : "Continue with Google"}
+            </button>
+            <div className="authDivider"><span>or</span></div>
+          </div>
+        )}
 
         <form action={mode === "signin" ? "/api/login" : "/api/signup"} className="form authForm" method="post" onSubmit={submit}>
           {mode === "signup" && (
