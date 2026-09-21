@@ -36,7 +36,7 @@ export function LoginForm({
       await authClient.signIn.social({
         provider: "google",
         callbackURL: "/",
-        errorCallbackURL: "/login?error=google",
+        errorCallbackURL: "/login",
       });
     } catch {
       setMessage("Could not sign in with Google. Try email and password instead.");
@@ -109,20 +109,6 @@ export function LoginForm({
             ? "Sign in to continue."
             : "Start with your first item. We’ll guide you step by step."}
         </p>
-
-        {googleEnabled && (
-          <div className="socialAuth">
-            <button
-              className="googleButton"
-              type="button"
-              onClick={signInWithGoogle}
-              disabled={googleBusy}
-            >
-              {googleBusy ? "Opening Google…" : "Continue with Google"}
-            </button>
-            <div className="authDivider"><span>or</span></div>
-          </div>
-        )}
 
         <form action={mode === "signin" ? "/api/login" : "/api/signup"} className="form authForm" method="post" onSubmit={submit}>
           {mode === "signup" && (
@@ -208,6 +194,20 @@ export function LoginForm({
             ? "First time? Create account"
             : "Already have an account? Sign in"}
         </a>
+
+        {googleEnabled && (
+          <div className="socialAuth socialAuthBottom">
+            <div className="authDivider"><span>or</span></div>
+            <button
+              className="googleButton"
+              type="button"
+              onClick={signInWithGoogle}
+              disabled={googleBusy}
+            >
+              {googleBusy ? "Opening Google…" : mode === "signin" ? "Sign in with Google" : "Sign up with Google"}
+            </button>
+          </div>
+        )}
       </section>
     </main>
   );

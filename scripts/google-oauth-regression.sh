@@ -5,9 +5,12 @@ grep -q 'createAuthClient' lib/auth-client.ts
 grep -q 'signIn.social' app/login/login-form.tsx
 grep -q 'provider: "google"' app/login/login-form.tsx
 grep -q 'callbackURL: "/"' app/login/login-form.tsx
-grep -q 'errorCallbackURL: "/login?error=google"' app/login/login-form.tsx
+grep -q 'errorCallbackURL: "/login"' app/login/login-form.tsx
 grep -q 'googleEnabled={capabilities.google}' app/login/page.tsx
 grep -q 'disableImplicitLinking: false' lib/auth.ts
+grep -Fq 'trustedProviders: ["google", "email-password"]' lib/auth.ts
+grep -q 'account_not_linked' app/login/page.tsx
+grep -q 'socialAuthBottom' app/login/login-form.tsx
 grep -q 'GOOGLE_CLIENT_ID' lib/auth.ts
 grep -q 'GOOGLE_CLIENT_SECRET' lib/auth.ts
 grep -q 'Try email and password instead' app/login/login-form.tsx

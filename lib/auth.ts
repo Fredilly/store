@@ -46,6 +46,7 @@ function createAuth() {
       accountLinking: {
         enabled: true,
         disableImplicitLinking: false,
+        trustedProviders: ["google", "email-password"],
       },
     },
     baseURL: runtime.BETTER_AUTH_URL,

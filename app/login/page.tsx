@@ -9,6 +9,7 @@ const errorMessages: Record<string, string> = {
   passwords: "Passwords do not match.",
   existing: "This email already has an account. Sign in instead.",
   google: "Could not sign in with Google. Try email and password instead.",
+  account_not_linked: "This Google account could not be linked. Try again or use your email and password.",
 };
 
 export default async function LoginPage({
