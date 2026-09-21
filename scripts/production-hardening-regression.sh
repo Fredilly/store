@@ -10,6 +10,6 @@ grep -q '"ok":true' .github/workflows/ci.yml
 grep -q 'SELECT 1 AS ok' app/api/health/route.ts
 grep -q 'Cache-Control' app/api/health/route.ts
 grep -q 'Do not deploy manually unless CI/CD itself is broken' PRODUCTION.md
-grep -q 'Google sign-in is intentionally tracked separately in issue #26' PRODUCTION.md
+grep -q 'Google sign-in remains secondary to email/password' PRODUCTION.md
 
 echo "PASS: production hardening acceptance"

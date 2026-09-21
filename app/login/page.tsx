@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { LoginForm } from "./login-form";
+import { authCapabilities } from "../../lib/auth";
 
 const errorMessages: Record<string, string> = {
   credentials: "Incorrect email or password.",
@@ -7,6 +8,7 @@ const errorMessages: Record<string, string> = {
   signup: "Could not create account. Please check your details and try again.",
   passwords: "Passwords do not match.",
   existing: "This email already has an account. Sign in instead.",
+  google: "Could not sign in with Google. Try email and password instead.",
 };
 
 export default async function LoginPage({
@@ -16,6 +18,7 @@ export default async function LoginPage({
 }) {
   const params = (await searchParams) ?? {};
   const cookieStore = await cookies();
+  const capabilities = authCapabilities();
   const initialMessage = params.error ? errorMessages[params.error] : undefined;
   const initialEmail = decodeURIComponent(
     cookieStore.get("login_email")?.value ?? ""
@@ -30,6 +33,7 @@ export default async function LoginPage({
       initialName={initialName}
       initialMessage={initialMessage}
       initialMode={params.mode === "signup" ? "signup" : "signin"}
+      googleEnabled={capabilities.google}
     />
   );
 }

@@ -42,6 +42,12 @@ function createAuth() {
 
   return betterAuth({
     database: runtime.DB,
+    account: {
+      accountLinking: {
+        enabled: true,
+        disableImplicitLinking: false,
+      },
+    },
     baseURL: runtime.BETTER_AUTH_URL,
     trustedOrigins,
     secret:
