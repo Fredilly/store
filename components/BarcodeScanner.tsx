@@ -57,7 +57,7 @@ export function BarcodeScanner({
     }
 
     setScanning(true);
-    setMessage("Opening rear camera… Point it at the barcode.");
+    setMessage("If your phone asks, tap Allow camera. Then point it at the barcode.");
 
     try {
       const { BrowserMultiFormatReader } = await import("@zxing/browser");
@@ -167,7 +167,7 @@ export function BarcodeScanner({
       const name = error instanceof Error ? error.name : "";
 
       if (name === "NotAllowedError" || name === "SecurityError") {
-        setMessage("Camera access is blocked. Allow camera access for this site, then try again.");
+        setMessage("Camera is blocked. Open this site’s settings, allow Camera, then try again. You can still choose the item manually.");
       } else if (name === "NotFoundError" || name === "DevicesNotFoundError") {
         setMessage("No usable camera was found. Choose the item manually.");
       } else if (name === "NotReadableError" || name === "TrackStartError") {
