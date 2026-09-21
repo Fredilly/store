@@ -1376,3 +1376,104 @@ button[aria-busy="true"] {
   flex: 1;
   background: #e3e5e8;
 }
+
+
+/* Platform owner dashboard — read only */
+.adminShell {
+  width: min(100%, 920px);
+}
+
+.adminSummary {
+  margin-bottom: 20px;
+}
+
+.adminSchoolList {
+  display: grid;
+  gap: 14px;
+}
+
+.adminSchoolCard h2 {
+  margin: 10px 0 4px;
+  font-size: 1.35rem;
+}
+
+.adminSchoolHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.adminSchoolHeader time {
+  flex: 0 0 auto;
+  color: #747982;
+  font-size: 0.9rem;
+  text-align: right;
+}
+
+.adminStatus {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #f0f2f5;
+  color: #555d68;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.adminStatusAddedinventory,
+.adminStatusFirstsale,
+.adminStatusActive {
+  background: #eef9f1;
+  color: #175c2d;
+}
+
+.adminMetrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.adminMetrics div {
+  padding: 12px;
+  border-radius: 14px;
+  background: #f7f8fa;
+}
+
+.adminMetrics span,
+.adminMetrics strong {
+  display: block;
+}
+
+.adminMetrics span {
+  color: #747982;
+  font-size: 0.82rem;
+}
+
+.adminMetrics strong {
+  margin-top: 4px;
+  font-size: 1.3rem;
+}
+
+.adminCreated {
+  margin: 14px 0 0;
+  color: #858a92;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 620px) {
+  .adminSchoolHeader {
+    flex-direction: column;
+  }
+
+  .adminSchoolHeader time {
+    text-align: left;
+  }
+
+  .adminMetrics {
+    grid-template-columns: 1fr 1fr;
+  }
+}

@@ -64,3 +64,13 @@ Temporary workers.dev and localhost origins are development-only.
 D1 migrations are applied before deployment. Existing export and D1 recovery procedures remain the recovery path for data.
 
 Google sign-in remains secondary to email/password. Keep issue #26 open until one real production Google login succeeds end-to-end.
+
+
+## Platform owner dashboard
+
+The read-only `/admin` dashboard is disabled unless `PLATFORM_ADMIN_EMAILS` is configured in the Worker environment.
+
+- use a comma-separated list of explicitly authorized login emails
+- access is denied to every other signed-in user
+- every dashboard view is written to `platform_admin_audit`
+- the dashboard cannot edit, impersonate, or switch into a school

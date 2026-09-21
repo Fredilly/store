@@ -14,7 +14,7 @@
     "typecheck": "tsc --noEmit",
     "test:core": "bash scripts/core-regression.sh",
     "test:authz": "bash scripts/authz-regression.sh",
-    "test:acceptance": "npm run test:authz && npm run test:core && npm run test:product-setup && npm run test:onboarding && npm run test:readability && npm run test:icons && npm run test:icon-visibility && npm run test:form-readability && npm run test:welcome-branding && npm run test:email-copy && npm run test:signup && npm run test:signup-errors && npm run test:corrections && npm run test:fraud-visibility && npm run test:history && npm run test:item-search && npm run test:mobile-app && npm run test:production && npm run test:google-oauth",
+    "test:acceptance": "npm run test:authz && npm run test:core && npm run test:product-setup && npm run test:onboarding && npm run test:readability && npm run test:icons && npm run test:icon-visibility && npm run test:form-readability && npm run test:welcome-branding && npm run test:email-copy && npm run test:signup && npm run test:signup-errors && npm run test:corrections && npm run test:fraud-visibility && npm run test:history && npm run test:item-search && npm run test:mobile-app && npm run test:production && npm run test:google-oauth && npm run test:platform-admin",
     "test:product-setup": "bash scripts/product-setup-regression.sh",
     "test:onboarding": "bash scripts/onboarding-regression.sh",
     "test:readability": "bash scripts/readability-regression.sh",
@@ -32,7 +32,8 @@
     "test:mobile-app": "bash scripts/mobile-app-regression.sh",
     "test:production": "bash scripts/production-hardening-regression.sh",
     "test:google-oauth": "bash scripts/google-oauth-regression.sh",
-    "test:v1-release": "bash scripts/v1-release-regression.sh"
+    "test:v1-release": "bash scripts/v1-release-regression.sh",
+    "test:platform-admin": "bash scripts/platform-admin-regression.sh"
   },
   "dependencies": {
     "@opennextjs/cloudflare": "1.20.6",
