@@ -112,7 +112,7 @@ Examples:
 
 Current stock is the sum of relevant movements.
 
-Corrections should create compensating entries rather than deleting history.
+Corrections create compensating entries rather than deleting history. Owner-only correction flows cover returns, damage, counted-stock adjustments, payment corrections, and full sale voids. Sale voids append `VOID_REVERSAL` stock movements and signed payment adjustments while preserving the original sale, items, payments, and audit history.
 
 ## Money Model
 For every sale, track:
@@ -227,6 +227,7 @@ Build only:
 11. Export/backup path
 12. Mobile polish
 13. Barcode scanning for stock and sales
+14. Owner corrections and sale voids using append-only ledgers
 
 ## Explicitly Deferred
 - advanced accounting
