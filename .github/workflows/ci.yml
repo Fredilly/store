@@ -43,6 +43,9 @@ jobs:
       - name: Export and recovery acceptance
         run: bash scripts/export-regression.sh
 
+      - name: V1 release ledger scenario
+        run: npm run test:v1-release
+
       - name: Verify immutable-history database guards
         run: |
           npx wrangler d1 execute store-db --local --json --command "
