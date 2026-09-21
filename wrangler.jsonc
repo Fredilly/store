@@ -30,6 +30,7 @@
   },
   "vars": {
     "BETTER_AUTH_URL": "https://store.article6.org",
-    "EMAIL_FROM": "School Ledger <no-reply@article6.org>"
+    "EMAIL_FROM": "School Ledger <no-reply@article6.org>",
+    "PLATFORM_ADMIN_EMAILS": "fredilly@gmail.com"
   }
 }
