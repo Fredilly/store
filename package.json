@@ -32,7 +32,7 @@
     "test:mobile-app": "bash scripts/mobile-app-regression.sh",
     "test:production": "bash scripts/production-hardening-regression.sh",
     "test:google-oauth": "bash scripts/google-oauth-regression.sh",
-    "test:v1-release": "bash scripts/v1-release-regression.sh",
+    "test:v1-release": "bash scripts/v1-release-regression.sh && bash scripts/v1-release-surface-regression.sh",
     "test:platform-admin": "bash scripts/platform-admin-regression.sh",
     "test:desktop-polish": "bash scripts/desktop-polish-regression.sh"
   },
