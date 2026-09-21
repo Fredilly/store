@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Icon } from "../../components/Icon";
+import { HistoryActions } from "../../components/history-actions";
 import { formatNaira } from "../../lib/money";
 import { listRecentTransactions } from "../../lib/queries";
 import { requirePageOwner } from "../../lib/tenant";
@@ -50,6 +51,7 @@ export default async function HistoryPage() {
         <p className="eyebrow">History</p>
         <h1>What happened</h1>
         <p className="muted">Recent sales, stock, payments, corrections, and expenses. Tap any row for details.</p>
+        <HistoryActions />
       </div>
 
       <section className="panel">
