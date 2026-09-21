@@ -1187,3 +1187,91 @@ button,
 .reviewList {
   margin-top: 18px;
 }
+
+
+/* Simple transaction history */
+.historyList {
+  display: grid;
+  gap: 10px;
+}
+
+.historyRow {
+  border-top: 1px solid #eceef1;
+  padding-top: 12px;
+}
+
+.historyRow:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.historyRow summary {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.historyRow summary::-webkit-details-marker {
+  display: none;
+}
+
+.historyRow strong,
+.historyRow span,
+.historyRow time {
+  display: block;
+}
+
+.historyRow span,
+.historyRow time,
+.historyDetails span {
+  color: #747982;
+  font-size: 0.95rem;
+}
+
+.historyRow time {
+  flex: 0 0 auto;
+  text-align: right;
+}
+
+.historyDetails {
+  display: grid;
+  gap: 4px;
+  margin-top: 10px;
+  padding-left: 14px;
+  border-left: 3px solid #e4e7eb;
+}
+
+
+.historyActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.historyActions .inlineAction,
+.historyShareButton {
+  margin-top: 0;
+  min-height: 52px;
+}
+
+.historyShareButton {
+  width: auto;
+  padding: 0 18px;
+  background: #15171a;
+}
+
+@media (max-width: 520px) {
+  .historyActions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .historyActions .inlineAction,
+  .historyShareButton {
+    width: 100%;
+  }
+}

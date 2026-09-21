@@ -230,3 +230,17 @@ Rules:
 - support reduced-motion preferences
 - prefer simple visible labels such as “Stock” and “What you have” over inventory jargon when meaning stays clear
 - polish must not change ledger, permissions, or workflow behavior
+
+
+## Daily Summary and History
+Home shows a concise daily owner summary:
+- Sold today
+- Received today
+- Still owed
+- Expenses today
+
+"Still owed" remains the current outstanding balance across active sales, not only today's sales.
+
+The current Nigeria deployment treats "today" as West Africa Time (UTC+1).
+
+Transaction history is owner-only and uses plain-language rows for sales, stock received, payments, expenses, voids, and corrections. Each row should show the actor and time and expand in place for details rather than forcing the user into a dense table.

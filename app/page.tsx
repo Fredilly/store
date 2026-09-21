@@ -1,7 +1,7 @@
 import { SignOutButton } from "../components/sign-out-button";
 import { Icon, type IconName } from "../components/Icon";
 import { formatNaira } from "../lib/money";
-import { moneySummary, onboardingProgress } from "../lib/queries";
+import { dailySummary, onboardingProgress } from "../lib/queries";
 import { requirePageTenant } from "../lib/tenant";
 
 const baseActions: Array<{ label: string; href: string; detail: string; icon: IconName }> = [
@@ -72,7 +72,7 @@ export default async function Home({
       progress.stockUnits > 0 &&
       progress.saleCount === 0
   );
-  const summary = tenant.role === "OWNER" && !isFirstRun ? await moneySummary(tenant.orgId) : null;
+  const summary = tenant.role === "OWNER" && !isFirstRun ? await dailySummary(tenant.orgId) : null;
   const success =
     params.success === "item" && progress?.productCount === 1
       ? "Nice — your first item is ready ✨"
@@ -131,11 +131,11 @@ export default async function Home({
           {summary && (
             <section className="summary" aria-label="Money summary">
               <div>
-                <span>Total sold</span>
+                <span>Sold today</span>
                 <strong>{formatNaira(summary.sales)}</strong>
               </div>
               <div>
-                <span>Money received</span>
+                <span>Received today</span>
                 <strong>{formatNaira(summary.received)}</strong>
               </div>
               <div>
@@ -160,6 +160,7 @@ export default async function Home({
           {tenant.role === "OWNER" && (
             <div className="ownerLinks">
               <a className="inlineAction" href="/staff">Manage staff →</a>
+              <a className="inlineAction" href="/history">History →</a>
               <a className="inlineAction" href="/corrections">Fix a mistake →</a>
               <a className="inlineAction" href="/export">Export records →</a>
             </div>

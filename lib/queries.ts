@@ -216,3 +216,104 @@ export async function onboardingProgress(orgId: string): Promise<OnboardingProgr
     saleCount: Number(row?.sale_count ?? 0),
   };
 }
+
+
+export type DailySummary = {
+  sales: number;
+  received: number;
+  outstanding: number;
+  expenses: number;
+};
+
+export async function dailySummary(orgId: string): Promise<DailySummary> {
+  const row = await db()
+    .prepare(
+      `SELECT
+        COALESCE((
+          SELECT SUM(total_minor)
+          FROM sales
+          WHERE organization_id = ?
+            AND status = 'COMPLETED'
+            AND date(created_at, '+1 hour') = date('now', '+1 hour')
+        ), 0) AS sales,
+        COALESCE((
+          SELECT SUM(amount_minor)
+          FROM payments
+          WHERE organization_id = ?
+            AND date(created_at, '+1 hour') = date('now', '+1 hour')
+        ), 0)
+        + COALESCE((
+          SELECT SUM(amount_delta_minor)
+          FROM payment_adjustments
+          WHERE organization_id = ?
+            AND date(created_at, '+1 hour') = date('now', '+1 hour')
+        ), 0) AS received,
+        COALESCE((
+          SELECT SUM(amount_minor)
+          FROM expenses
+          WHERE organization_id = ?
+            AND date(created_at, '+1 hour') = date('now', '+1 hour')
+        ), 0) AS expenses,
+        COALESCE((
+          SELECT SUM(total_minor)
+          FROM sales
+          WHERE organization_id = ?
+            AND status = 'COMPLETED'
+        ), 0)
+        - (
+          COALESCE((SELECT SUM(amount_minor) FROM payments WHERE organization_id = ?), 0)
+          + COALESCE((SELECT SUM(amount_delta_minor) FROM payment_adjustments WHERE organization_id = ?), 0)
+        ) AS outstanding`
+    )
+    .bind(orgId, orgId, orgId, orgId, orgId, orgId, orgId)
+    .first<DailySummary>();
+
+  return {
+    sales: Number(row?.sales ?? 0),
+    received: Number(row?.received ?? 0),
+    outstanding: Math.max(0, Number(row?.outstanding ?? 0)),
+    expenses: Number(row?.expenses ?? 0),
+  };
+}
+
+export type RecentTransaction = {
+  id: string;
+  event_type: string;
+  entity_id: string;
+  metadata_json: string | null;
+  created_at: string;
+  actor_name: string | null;
+  actor_email: string | null;
+};
+
+export async function listRecentTransactions(orgId: string): Promise<RecentTransaction[]> {
+  const result = await db()
+    .prepare(
+      `SELECT
+        a.id,
+        a.event_type,
+        a.entity_id,
+        a.metadata_json,
+        a.created_at,
+        u.name AS actor_name,
+        u.email AS actor_email
+      FROM audit_events a
+      LEFT JOIN "user" u ON u.id = a.actor_user_id
+      WHERE a.organization_id = ?
+        AND a.event_type IN (
+          'SALE_CREATED',
+          'SALE_VOIDED',
+          'STOCK_RECEIVED',
+          'STOCK_CORRECTED',
+          'PAYMENT_RECORDED',
+          'PAYMENT_CORRECTED',
+          'EXPENSE_RECORDED'
+        )
+      ORDER BY a.created_at DESC
+      LIMIT 100`
+    )
+    .bind(orgId)
+    .all<RecentTransaction>();
+
+  return result.results;
+}
