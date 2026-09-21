@@ -27,7 +27,18 @@ const eventLabels: Record<string, string> = {
   SALE_VOIDED: "Voided a sale",
   PAYMENT_CORRECTED: "Corrected money received",
   STOCK_CORRECTED: "Corrected stock",
+  DATA_EXPORTED: "Exported records",
+  PRODUCT_PRICE_CHANGED: "Changed an item price",
 };
+
+const reviewEventTypes = new Set([
+  "SALE_VOIDED",
+  "PAYMENT_CORRECTED",
+  "STOCK_CORRECTED",
+  "STAFF_STATUS_CHANGED",
+  "DATA_EXPORTED",
+  "PRODUCT_PRICE_CHANGED",
+]);
 
 function describeMetadata(value: string | null) {
   if (!value) return null;
@@ -55,11 +66,18 @@ function describeMetadata(value: string | null) {
     if (typeof metadata.adjustmentMinor === "number") {
       parts.push(`Money correction: ${metadata.adjustmentMinor}`);
     }
+    if (typeof metadata.kind === "string") {
+      parts.push(`Export: ${metadata.kind}`);
+    }
 
     return parts.length > 0 ? parts.join(" · ") : null;
   } catch {
     return null;
   }
+}
+
+function actorName(event: ActivityRow) {
+  return event.actor_name || event.actor_email || "Unknown user";
 }
 
 export default async function ActivityPage() {
@@ -89,6 +107,13 @@ export default async function ActivityPage() {
     .bind(tenant.orgId)
     .all<ActivityRow>();
 
+  const reviewEvents = result.results.filter((event) => reviewEventTypes.has(event.event_type));
+  const actorReviewCounts = new Map<string, number>();
+  for (const event of reviewEvents) {
+    const actor = actorName(event);
+    actorReviewCounts.set(actor, (actorReviewCounts.get(actor) ?? 0) + 1);
+  }
+
   return (
     <main className="shell">
       <div className="pageTop">
@@ -100,24 +125,53 @@ export default async function ActivityPage() {
         </p>
       </div>
 
-      <section className="panel">
+      {reviewEvents.length > 0 && (
+        <section className="panel reviewPanel" aria-label="Changes to review">
+          <p className="eyebrow">Changes to review</p>
+          <h2>{reviewEvents.length} sensitive {reviewEvents.length === 1 ? "change" : "changes"} in recent activity</h2>
+          <p className="muted">
+            Voids, corrections, staff-access changes, and exports are shown here so they are hard to miss.
+            This does not mean fraud occurred.
+          </p>
+          <div className="balanceList reviewList">
+            {reviewEvents.slice(0, 12).map((event) => {
+              const detail = describeMetadata(event.metadata_json);
+              const actor = actorName(event);
+              const repeatCount = actorReviewCounts.get(actor) ?? 1;
+
+              return (
+                <div className="balanceRow" key={event.id}>
+                  <div>
+                    <strong>{eventLabels[event.event_type] || event.event_type}</strong>
+                    <span>
+                      {actor}
+                      {event.actor_role ? ` · ${event.actor_role}` : ""}
+                      {repeatCount >= 3 ? ` · ${repeatCount} reviewable changes in recent activity` : ""}
+                    </span>
+                    {detail && <span>{detail}</span>}
+                    <span>{event.created_at}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      <section className="panel secondaryPanel">
+        <h2>All activity</h2>
         {result.results.length === 0 ? (
           <p className="muted">No activity yet.</p>
         ) : (
           <div className="balanceList">
             {result.results.map((event) => {
               const detail = describeMetadata(event.metadata_json);
-              const actor =
-                event.actor_name ||
-                event.actor_email ||
-                "Unknown user";
+              const actor = actorName(event);
 
               return (
                 <div className="balanceRow" key={event.id}>
                   <div>
-                    <strong>
-                      {eventLabels[event.event_type] || event.event_type}
-                    </strong>
+                    <strong>{eventLabels[event.event_type] || event.event_type}</strong>
                     <span>
                       {actor}
                       {event.actor_role ? ` · ${event.actor_role}` : ""}
