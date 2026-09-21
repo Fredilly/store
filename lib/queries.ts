@@ -5,6 +5,9 @@ export type VariantOption = {
   label: string;
   selling_price_minor: number;
   stock: number;
+  category: string | null;
+  sale_count: number;
+  last_sold_at: string | null;
 };
 
 export type OutstandingSale = {
@@ -34,22 +37,40 @@ export async function listVariants(orgId: string): Promise<VariantOption[]> {
           ELSE p.name || ' · ' || v.variant_name
         END AS label,
         v.selling_price_minor,
-        COALESCE(SUM(m.quantity_delta), 0) AS stock
+        p.category,
+        COALESCE(SUM(m.quantity_delta), 0) AS stock,
+        COUNT(DISTINCT CASE WHEN s.status = 'COMPLETED' THEN si.sale_id END) AS sale_count,
+        MAX(CASE WHEN s.status = 'COMPLETED' THEN s.created_at END) AS last_sold_at
       FROM product_variants v
       JOIN products p ON p.id = v.product_id
       LEFT JOIN stock_movements m
         ON m.product_variant_id = v.id
         AND m.organization_id = v.organization_id
+      LEFT JOIN sale_items si
+        ON si.product_variant_id = v.id
+        AND si.organization_id = v.organization_id
+      LEFT JOIN sales s
+        ON s.id = si.sale_id
+        AND s.organization_id = v.organization_id
       WHERE v.organization_id = ?
         AND v.active = 1
         AND p.active = 1
-      GROUP BY v.id, p.name, v.variant_name, v.selling_price_minor
-      ORDER BY p.name, v.variant_name`
+      GROUP BY v.id, p.name, p.category, v.variant_name, v.selling_price_minor
+      ORDER BY
+        CASE WHEN MAX(CASE WHEN s.status = 'COMPLETED' THEN s.created_at END) IS NULL THEN 1 ELSE 0 END,
+        MAX(CASE WHEN s.status = 'COMPLETED' THEN s.created_at END) DESC,
+        COUNT(DISTINCT CASE WHEN s.status = 'COMPLETED' THEN si.sale_id END) DESC,
+        p.name,
+        v.variant_name`
     )
     .bind(orgId)
     .all<VariantOption>();
 
-  return result.results.map((row) => ({ ...row, stock: Number(row.stock) }));
+  return result.results.map((row) => ({
+    ...row,
+    stock: Number(row.stock),
+    sale_count: Number(row.sale_count),
+  }));
 }
 
 export async function moneySummary(orgId: string) {
