@@ -148,6 +148,8 @@ Critical events include:
 
 Deletion of financial or inventory history should generally be prohibited.
 
+The owner Activity screen must separately surface sensitive events that deserve review, including sale voids, payment corrections, stock corrections, staff-access changes, and data exports. Repeated sensitive changes by the same actor should be visible without labeling the behavior as fraud automatically.
+
 ## Mobile Input Rules
 A normal sale should be recordable in about five seconds once products exist.
 
