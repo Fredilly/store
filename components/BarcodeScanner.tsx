@@ -56,7 +56,8 @@ export function BarcodeScanner({
       return;
     }
 
-    setScanning(true);\n    setMessage("If your phone asks, tap Allow camera. Then point it at the barcode.");
+    setScanning(true);
+    setMessage("If your phone asks, tap Allow camera. Then point it at the barcode.");
 
     try {
       const { BrowserMultiFormatReader } = await import("@zxing/browser");
