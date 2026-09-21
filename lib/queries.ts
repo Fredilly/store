@@ -16,6 +16,14 @@ export type OutstandingSale = {
   created_at: string;
 };
 
+export type CorrectableSale = {
+  id: string;
+  label: string;
+  total_minor: number;
+  paid_minor: number;
+  created_at: string;
+};
+
 export async function listVariants(orgId: string): Promise<VariantOption[]> {
   const result = await db()
     .prepare(
@@ -49,10 +57,11 @@ export async function moneySummary(orgId: string) {
     .prepare(
       `SELECT
         COALESCE((SELECT SUM(total_minor) FROM sales WHERE organization_id = ? AND status = 'COMPLETED'), 0) AS sales,
-        COALESCE((SELECT SUM(amount_minor) FROM payments WHERE organization_id = ?), 0) AS received,
+        COALESCE((SELECT SUM(amount_minor) FROM payments WHERE organization_id = ?), 0)
+          + COALESCE((SELECT SUM(amount_delta_minor) FROM payment_adjustments WHERE organization_id = ?), 0) AS received,
         COALESCE((SELECT SUM(amount_minor) FROM expenses WHERE organization_id = ?), 0) AS expenses`
     )
-    .bind(orgId, orgId, orgId)
+    .bind(orgId, orgId, orgId, orgId)
     .first<{ sales: number; received: number; expenses: number }>();
 
   const sales = Number(row?.sales ?? 0);
@@ -84,8 +93,8 @@ export async function listOutstandingSales(orgId: string): Promise<OutstandingSa
           ', '
         ), 'Sale') AS label,
         s.total_minor,
-        COALESCE(pay.paid_minor, 0) AS paid_minor,
-        s.total_minor - COALESCE(pay.paid_minor, 0) AS balance_minor,
+        COALESCE(pay.paid_minor, 0) + COALESCE(adj.adjusted_minor, 0) AS paid_minor,
+        s.total_minor - (COALESCE(pay.paid_minor, 0) + COALESCE(adj.adjusted_minor, 0)) AS balance_minor,
         s.created_at
       FROM sales s
       JOIN sale_items si
@@ -100,10 +109,17 @@ export async function listOutstandingSales(orgId: string): Promise<OutstandingSa
       ) pay
         ON pay.sale_id = s.id
         AND pay.organization_id = s.organization_id
+      LEFT JOIN (
+        SELECT sale_id, organization_id, SUM(amount_delta_minor) AS adjusted_minor
+        FROM payment_adjustments
+        GROUP BY sale_id, organization_id
+      ) adj
+        ON adj.sale_id = s.id
+        AND adj.organization_id = s.organization_id
       WHERE s.organization_id = ?
         AND s.status = 'COMPLETED'
-      GROUP BY s.id, s.customer_name, s.total_minor, pay.paid_minor, s.created_at
-      HAVING s.total_minor - COALESCE(pay.paid_minor, 0) > 0
+      GROUP BY s.id, s.customer_name, s.total_minor, pay.paid_minor, adj.adjusted_minor, s.created_at
+      HAVING s.total_minor - (COALESCE(pay.paid_minor, 0) + COALESCE(adj.adjusted_minor, 0)) > 0
       ORDER BY s.created_at DESC
       LIMIT 50`
     )
@@ -118,6 +134,60 @@ export async function listOutstandingSales(orgId: string): Promise<OutstandingSa
   }));
 }
 
+export async function listCorrectableSales(orgId: string): Promise<CorrectableSale[]> {
+  const result = await db()
+    .prepare(
+      `SELECT
+        s.id,
+        CASE
+          WHEN s.customer_name IS NOT NULL AND s.customer_name <> '' THEN s.customer_name || ' · '
+          ELSE ''
+        END ||
+        COALESCE(GROUP_CONCAT(
+          CASE
+            WHEN v.variant_name IS NULL OR v.variant_name = '' THEN p.name
+            ELSE p.name || ' · ' || v.variant_name
+          END,
+          ', '
+        ), 'Sale') AS label,
+        s.total_minor,
+        COALESCE(pay.paid_minor, 0) + COALESCE(adj.adjusted_minor, 0) AS paid_minor,
+        s.created_at
+      FROM sales s
+      JOIN sale_items si
+        ON si.sale_id = s.id
+        AND si.organization_id = s.organization_id
+      JOIN product_variants v ON v.id = si.product_variant_id
+      JOIN products p ON p.id = v.product_id
+      LEFT JOIN (
+        SELECT sale_id, organization_id, SUM(amount_minor) AS paid_minor
+        FROM payments
+        GROUP BY sale_id, organization_id
+      ) pay
+        ON pay.sale_id = s.id
+        AND pay.organization_id = s.organization_id
+      LEFT JOIN (
+        SELECT sale_id, organization_id, SUM(amount_delta_minor) AS adjusted_minor
+        FROM payment_adjustments
+        GROUP BY sale_id, organization_id
+      ) adj
+        ON adj.sale_id = s.id
+        AND adj.organization_id = s.organization_id
+      WHERE s.organization_id = ?
+        AND s.status = 'COMPLETED'
+      GROUP BY s.id, s.customer_name, s.total_minor, pay.paid_minor, adj.adjusted_minor, s.created_at
+      ORDER BY s.created_at DESC
+      LIMIT 50`
+    )
+    .bind(orgId)
+    .all<CorrectableSale>();
+
+  return result.results.map((row) => ({
+    ...row,
+    total_minor: Number(row.total_minor),
+    paid_minor: Number(row.paid_minor),
+  }));
+}
 
 export type OnboardingProgress = {
   productCount: number;
