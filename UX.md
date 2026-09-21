@@ -244,3 +244,16 @@ Home shows a concise daily owner summary:
 The current Nigeria deployment treats "today" as West Africa Time (UTC+1).
 
 Transaction history is owner-only and uses plain-language rows for sales, stock received, payments, expenses, voids, and corrections. Each row should show the actor and time and expand in place for details rather than forcing the user into a dense table.
+
+
+## Phone app behavior
+School Ledger should remain a simple web app that can be added to a phone Home Screen and opened in standalone mode.
+
+Do not add offline sync or aggressive service-worker caching in V1. Reliability and clarity are more important than pretending to be a native app.
+
+Mobile rules:
+- respect phone safe areas/notches
+- keep primary controls large and one-hand friendly
+- explain camera permission in plain language
+- if camera access fails, manual item selection must still work
+- critical form buttons should guard against accidental double taps
