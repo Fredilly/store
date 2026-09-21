@@ -1172,3 +1172,18 @@ button,
     margin-left: 31px;
   }
 }
+
+
+/* Sensitive-change review */
+.reviewPanel {
+  border-color: #efd89f;
+  background: #fffdf7;
+}
+
+.reviewPanel .eyebrow {
+  color: #7a5200;
+}
+
+.reviewList {
+  margin-top: 18px;
+}
