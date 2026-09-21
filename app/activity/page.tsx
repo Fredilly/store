@@ -23,7 +23,10 @@ const eventLabels: Record<string, string> = {
   EXPENSE_RECORDED: "Recorded an expense",
   STAFF_INVITED: "Invited staff",
   STAFF_INVITE_ACCEPTED: "Accepted a staff invite",
-  STAFF_STATUS_CHANGED: "Changed staff access",\n  SALE_VOIDED: "Voided a sale",\n  PAYMENT_CORRECTED: "Corrected money received",\n  STOCK_CORRECTED: "Corrected stock",
+  STAFF_STATUS_CHANGED: "Changed staff access",
+  SALE_VOIDED: "Voided a sale",
+  PAYMENT_CORRECTED: "Corrected money received",
+  STOCK_CORRECTED: "Corrected stock",
 };
 
 function describeMetadata(value: string | null) {
@@ -42,6 +45,15 @@ function describeMetadata(value: string | null) {
     }
     if (typeof metadata.from === "string" && typeof metadata.to === "string") {
       parts.push(`${metadata.from} → ${metadata.to}`);
+    }
+    if (typeof metadata.reason === "string" && metadata.reason) {
+      parts.push(`Reason: ${metadata.reason}`);
+    }
+    if (typeof metadata.quantityDelta === "number") {
+      parts.push(`Stock change: ${metadata.quantityDelta > 0 ? "+" : ""}${metadata.quantityDelta}`);
+    }
+    if (typeof metadata.adjustmentMinor === "number") {
+      parts.push(`Money correction: ${metadata.adjustmentMinor}`);
     }
 
     return parts.length > 0 ? parts.join(" · ") : null;
