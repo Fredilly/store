@@ -4,7 +4,10 @@ set -euo pipefail
 DB="store-db"
 
 run_sql() {
-  npx wrangler d1 execute "$DB" --local --command "$1" >/tmp/corrections-regression.log 2>&1
+  if ! npx wrangler d1 execute "$DB" --local --command "$1" >/tmp/corrections-regression.log 2>&1; then
+    cat /tmp/corrections-regression.log
+    return 1
+  fi
 }
 
 query_json() {
