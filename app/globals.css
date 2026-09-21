@@ -1347,3 +1347,32 @@ button[aria-busy="true"] {
     padding-bottom: calc(40px + env(safe-area-inset-bottom));
   }
 }
+
+
+/* Optional Google sign-in */
+.socialAuth {
+  margin-top: 20px;
+}
+
+.googleButton {
+  background: #fff;
+  color: #15171a;
+  border: 1px solid #ccd1d8;
+}
+
+.authDivider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 14px 0;
+  color: #858a92;
+  font-size: 0.9rem;
+}
+
+.authDivider::before,
+.authDivider::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: #e3e5e8;
+}
